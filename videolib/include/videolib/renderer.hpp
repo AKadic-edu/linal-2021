@@ -3,6 +3,8 @@
 #ifndef VIDEOLIB_RENDERER_HPP
 #define VIDEOLIB_RENDERER_HPP
 
+#include <vector>
+
 #include <mathlib/vector.hpp>
 
 struct SDL_Renderer;
@@ -22,6 +24,7 @@ namespace vl {
 
 		void clear(int = 0, int = 0, int = 0, int = 0);
 		void drawLine(const Line&);
+		void drawLines(const std::vector<Line>&);
 		void setColor(int, int, int, int = 255);
 	private:
 		SDL_Renderer& m_rendererHandle;

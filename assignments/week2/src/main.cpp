@@ -28,18 +28,19 @@ void drawGrid(vl::Renderer& renderer)
 {
 	renderer.setColor(g_grey, g_grey, g_grey);
 
+	std::vector<vl::Line> lines;
+
 	for (int i { -g_xSteps }; i < g_xSteps; i+=2) {
 		float offset { i * g_xSlope };
 
-		vl::Line l { offset, -1, offset, 1 };
-
-		renderer.drawLine(l);
+		lines.push_back({ offset, -1, offset, 1 });
 	}
 	for (int i { -g_ySteps }; i < g_ySteps; i += 2) {
 		float offset { i * g_ySlope };
 
-		vl::Line l { -1, offset, 1, offset };
-
+		lines.push_back({ -1, offset, 1, offset });
+	}
+	for (const auto& l : lines) {
 		renderer.drawLine(l);
 	}
 }
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
 
 	instance.onMouseMove([&](float x, float y) {
 		vector[0] = x * g_xSteps / 2;
-		vector[1] = y * g_xSteps / 2;
+		vector[1] = y * g_ySteps / 2;
 	});
 
 	return instance.run([&](vl::Renderer& renderer) {

@@ -4,122 +4,49 @@
 #define MATHLIB_VECTOR_H
 
 namespace ml {
-	template<typename T, int N>
+	template<typename T, size_t N>
 	struct Vector {
 		T v[N] { 0 };
 
-		constexpr T& operator[](int index)
+		constexpr T& operator[](size_t index)
 		{
 			return v[index];
 		}
-		constexpr const T& operator[](int index) const
+		constexpr const T& operator[](size_t index) const
 		{
 			return v[index];
-		}
-		constexpr Vector operator-(Vector& a) const
-		{
-			Vector out;
-
-			for (int i { 0 }; i < N; ++i) {
-				out[i] = v[i] - a[i];
-			}
-
-			return out;
-		}
-		constexpr Vector operator*(Vector<float, N>& a) const
-		{
-			Vector out;
-
-			for (int i{ 0 }; i < N; ++i) {
-				out[i] = v[i] * static_cast<T>(a[i]);
-			}
-
-			return out;
-		}
-		constexpr Vector operator*(Vector<int, N>& a) const
-		{
-			Vector out;
-
-			for (int i{ 0 }; i < N; ++i) {
-				out[i] = v[i] * static_cast<T>(a[i]);
-			}
-
-			return out;
-		}
-		constexpr Vector operator*(int a) const
-		{
-			Vector out;
-
-			for (int i{ 0 }; i < N; ++i) {
-				out[i] = v[i] * a;
-			}
-
-			return out;
-		}
-		constexpr Vector operator/(int a) const
-		{
-			Vector out;
-
-			for (int i{ 0 }; i < N; ++i) {
-				out[i] = v[i] / a;
-			}
-
-			return out;
 		}
 	};
 
-	template<typename T, int N>
-	constexpr Vector<T, N> operator+(T a, const Vector<T, N>& b)
-	{
-		Vector<T, N> out;
-
-		for (int i{ 0 }; i < N; ++i) {
-			out[i] = a + static_cast<T>(b[i]);
-		}
-
-		return out;
-	}
-	template<typename T, int N>
-	constexpr Vector<T, N> operator+(const Vector<T, N>& a, T b)
-	{
-		Vector<T, N> out;
-
-		for (int i{ 0 }; i < N; ++i) {
-			out[i] = a[i] + static_cast<T>(b);
-		}
-
-		return out;
-	}
-	template<typename T, int N>
-	constexpr Vector<T, N> operator+(const Vector<T, N>& a, const Vector<T, N>& b)
-	{
-		Vector<T, N> out;
-
-		for (int i{ 0 }; i < N; ++i) {
-			out[i] = a[i] + static_cast<T>(b[i]);
-		}
-
-		return out;
-	}
-	template<typename T, typename S, int N>
+	template<typename T, typename S, size_t N>
 	constexpr Vector<T, N> operator+(const Vector<T, N>& a, const Vector<S, N>& b)
 	{
 		Vector<T, N> out;
 
-		for (int i{ 0 }; i < N; ++i) {
+		for (size_t i { 0 }; i < N; ++i) {
 			out[i] = a[i] + static_cast<T>(b[i]);
 		}
 
 		return out;
 	}
-
-	template<typename T, int N>
-	constexpr Vector<T, N> operator*(T a, const Vector<T, N>& b)
+	template<typename T, typename S, size_t N>
+	constexpr Vector<T, N> operator-(const Vector<T, N>& a, const Vector<S, N>& b)
 	{
 		Vector<T, N> out;
 
-		for (int i{ 0 }; i < N; ++i) {
-			out[i] = b[i] * static_cast<T>(a);
+		for (size_t i { 0 }; i < N; ++i) {
+			out[i] = a[i] - static_cast<T>(b[i]);
+		}
+
+		return out;
+	}
+	template<typename T, typename S, size_t N>
+	constexpr Vector<T, N> operator*(T scalar, const Vector<S, N>& v)
+	{
+		Vector<T, N> out;
+
+		for (size_t i { 0 }; i < N; ++i) {
+			out[i] = scalar * static_cast<T>(v[i]);
 		}
 
 		return out;

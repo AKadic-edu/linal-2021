@@ -10,6 +10,10 @@
 #pragma warning ( disable : ALL_CODE_ANALYSIS_WARNINGS )
 #endif
 
+#include <algorithm>
+#include <iterator>
+#include <utility>
+
 #include <catch2/catch.hpp>
 #include <SDL.h>
 
