@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef MATHLIB_H
-#define MATHLIB_H
+#ifndef MATHLIB_HPP
+#define MATHLIB_HPP
 
 #ifdef _MSC_VER
 	#include <CodeAnalysis/Warnings.h>
@@ -16,4 +16,4 @@
 	#pragma warning ( pop )
 #endif
 
-#endif // !MATHLIB_H
+#endif // !MATHLIB_HPP
