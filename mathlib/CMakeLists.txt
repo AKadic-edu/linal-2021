@@ -7,7 +7,8 @@ target_include_directories(${PROJECT_NAME}
 	INTERFACE "${CMAKE_CURRENT_LIST_DIR}/include")
 
 add_executable(${PROJECT_TEST_NAME}
-	"test/001_vector.cpp")
+	"test/001_vector.cpp"
+	"test/002_matrix.cpp")
 	
 target_include_directories(${PROJECT_TEST_NAME}
 	PRIVATE ${CMAKE_CURRENT_LIST_DIR})

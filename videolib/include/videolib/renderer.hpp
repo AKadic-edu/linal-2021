@@ -20,7 +20,7 @@ namespace vl {
 		Renderer& operator=(Renderer&&) = delete;
 		virtual ~Renderer() = default;
 
-		void clear();
+		void clear(int = 0, int = 0, int = 0, int = 0);
 		void drawLine(const Line&);
 		void setColor(int, int, int, int = 255);
 	private:

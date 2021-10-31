@@ -2,7 +2,7 @@
 
 #include "mathlib.hpp"
 
-TEST_CASE("Vector", "[Vector]") {
+TEST_CASE("Vector") {
     SECTION("can be created") {
         SECTION("with int") {
             // Arrange

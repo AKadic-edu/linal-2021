@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 
     SDL_Window* window = SDL_CreateWindow
     (
-        "Jeu de la vie",
+        "Week1",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         g_windowWidth,

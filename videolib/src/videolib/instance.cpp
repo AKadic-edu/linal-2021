@@ -2,6 +2,7 @@
 
 #include "videolib.hpp"
 
+#include "include/videolib/key.hpp"
 #include "include/videolib/renderer.hpp"
 #include "include/videolib/window.hpp"
 
@@ -29,11 +30,21 @@ int vl::Instance::run(std::function<void(Renderer&)> cb)
 	return 0;
 }
 
+void vl::Instance::onKeyDown(KeyHandler h)
+{
+    m_keyHandlers.push_back(h);
+}
+
+void vl::Instance::onMouseMove(MouseHandler h)
+{
+    m_mouseHandlers.push_back(h);
+}
+
 void vl::Instance::setup()
 {
     m_windowHandle = SDL_CreateWindow
     (
-        "Jeu de la vie",
+        "Week 2",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         m_window.width,
@@ -51,6 +62,12 @@ void vl::Instance::pollInput()
     while (SDL_PollEvent(&e)) {
         switch (e.type)
         {
+        case SDL_KEYDOWN:
+            handleKeyDown(e.key);
+            break;
+        case SDL_MOUSEMOTION:
+            handleMouseMove(e.motion);
+            break;
         case SDL_WINDOWEVENT:
         {
             switch (e.window.event)
@@ -65,10 +82,12 @@ void vl::Instance::pollInput()
 
                 m_window.width = newWidth;
                 m_window.height = newHeight;
+                break;
             }
             default:
                 break;
             }
+            break;
         }
         default:
             break;
@@ -86,4 +105,29 @@ void vl::Instance::teardown()
 	SDL_DestroyRenderer(m_rendererHandle);
 	SDL_DestroyWindow(m_windowHandle);
 	SDL_Quit();
+}
+
+void vl::Instance::handleKeyDown(const SDL_KeyboardEvent& e)
+{
+    for (auto& h : m_keyHandlers) {
+        h(convertKey(e.keysym.sym));
+    }
+}
+
+void vl::Instance::handleMouseMove(const SDL_MouseMotionEvent& e)
+{
+    float normalizedX { -1.0f + 2.0f * (static_cast<float>(e.x) / m_window.width) };
+    float normalizedY { 1.0f - 2.0f * (static_cast<float>(e.y) / m_window.height) };
+
+    for (auto& h: m_mouseHandlers) {
+        h(normalizedX, normalizedY);
+    }
+}
+
+vl::Key vl::Instance::convertKey(SDL_Keycode key) const
+{
+    if (key == SDLK_k) return vl::Key::k;
+    if (key == SDLK_l) return vl::Key::l;
+
+    throw std::exception { "Key not mapped"};
 }

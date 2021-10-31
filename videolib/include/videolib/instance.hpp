@@ -5,7 +5,12 @@
 
 #include <functional>
 #include <memory>
+#include <vector>
 
+#include "key.hpp"
+
+struct SDL_KeyboardEvent;
+struct SDL_MouseMotionEvent;
 struct SDL_Renderer;
 struct SDL_Window;
 
@@ -15,6 +20,9 @@ namespace vl {
 
     class Instance {
     public:
+        typedef std::function<void(const Key&)> KeyHandler;
+        typedef std::function<void(float, float)> MouseHandler;
+
         Instance(Window&);
         Instance(Instance const&) = delete;
         Instance(Instance&&) = delete;
@@ -23,6 +31,9 @@ namespace vl {
         virtual ~Instance();
 
         int run(std::function<void(Renderer&)>);
+
+        void onKeyDown(KeyHandler);
+        void onMouseMove(MouseHandler);
     private:
         bool m_running;
 
@@ -32,10 +43,18 @@ namespace vl {
         SDL_Renderer* m_rendererHandle;
         SDL_Window* m_windowHandle;
 
+        std::vector<KeyHandler> m_keyHandlers;
+        std::vector<MouseHandler> m_mouseHandlers;
+
         void pollInput();
         void render();
         void setup();
         void teardown();
+
+        void handleKeyDown(const SDL_KeyboardEvent&);
+        void handleMouseMove(const SDL_MouseMotionEvent&);
+
+        vl::Key convertKey(signed int) const;
     };
 }
 

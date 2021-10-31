@@ -11,8 +11,9 @@ vl::Renderer::Renderer(SDL_Renderer& rendererHandle, const Window& window)
     , m_window { window }
 { }
 
-void vl::Renderer::clear()
+void vl::Renderer::clear(int r, int g, int b, int a)
 {
+    setColor(r, g, b, a);
     SDL_RenderClear(&m_rendererHandle);
 }
 
