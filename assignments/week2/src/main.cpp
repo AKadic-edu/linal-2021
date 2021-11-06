@@ -1,12 +1,12 @@
 #include "week2.hpp"
 
 #include <mathlib/matrix.hpp>
-#include <videolib/shapes/line.hpp>
-#include <videolib/shapes/rectangle.hpp>
 #include <videolib/instance.hpp>
 #include <videolib/key.hpp>
 #include <videolib/renderer.hpp>
 #include <videolib/window.hpp>
+#include <videolib/shapes/line.hpp>
+#include <videolib/shapes/rectangle.hpp>
 
 int g_xSteps { 10 };
 int g_ySteps { 10 };
@@ -14,8 +14,8 @@ int g_ySteps { 10 };
 float g_xSlope { 1.0f / g_xSteps };
 float g_ySlope { 1.0f / g_ySteps };
 
-vl::Line g_hAxis { -1.0f, 0, 1.0f, 0 };
-vl::Line g_vAxis { 0, -1.0f, 0, 1.0f };
+vl::Line g_hAxis { -1.0f,  0.0f, 1.0f, 0.0f };
+vl::Line g_vAxis {  0.0f, -1.0f, 0.0f, 1.0f };
 
 int g_grey { 100 };
 
@@ -31,7 +31,6 @@ ml::Matrix<float, 2, 2> g_shear { ml::Vector<float, 2>
 };
 ml::Vector<float, 2> g_vector { 1.0f, 1.0f };
 					 
-
 void drawAxis(vl::Renderer& renderer)
 {
 	renderer.color(255, 255, 255);

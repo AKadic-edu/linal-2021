@@ -2,7 +2,27 @@
 
 #include "mathlib.hpp"
 
-TEST_CASE("Matrix") {
+TEST_CASE("1x2 matrix") {
+	SECTION("can be multiplied") {
+		SECTION("by vector") {
+			// Arrange
+			ml::Vector<float, 2> v { 4.0f, 3.0f };
+			ml::Matrix<float, 1, 2> m { ml::Vector<float, 1>
+				{  1.0f },
+				{ -2.0f }
+			};
+			float expected = 4.0f * 1.0f + 3.0f * -2.0f;
+
+			// Act
+			auto mv = m * v;
+
+			// Assert
+			REQUIRE(mv == expected);
+		}
+	}
+}
+
+TEST_CASE("2x2 matrix") {
 	SECTION("can be multiplied") {
 		SECTION("by vector") {
 			// Arrange
