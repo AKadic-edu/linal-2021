@@ -37,32 +37,32 @@ namespace ml {
 		{
 			Vector<S, N> out;
 
-			for (size_t i{ 0 }; i < N; ++i) {
-				out[i] = static_cast<S>(v[i]);
+			for (size_t i { 0 }; i < N; ++i) {
+				out[i] = v[i];
 			}
 
 			return out;
 		}
 	};
 
-	template<typename T, typename U, size_t N>
-	constexpr Vector<T, N> operator+(const Vector<T, N>& a, const Vector<U, N>& b)
+	template<typename T, size_t N>
+	constexpr Vector<T, N> operator+(const Vector<T, N>& a, const Vector<T, N>& b)
 	{
 		Vector<T, N> out;
 
 		for (size_t i { 0 }; i < N; ++i) {
-			out[i] = a[i] + static_cast<T>(b[i]);
+			out[i] = a[i] + b[i];
 		}
 
 		return out;
 	}
-	template<typename T, typename U, size_t N>
-	constexpr Vector<T, N> operator-(const Vector<T, N>& a, const Vector<U, N>& b)
+	template<typename T, size_t N>
+	constexpr Vector<T, N> operator-(const Vector<T, N>& a, const Vector<T, N>& b)
 	{
 		Vector<T, N> out;
 
 		for (size_t i { 0 }; i < N; ++i) {
-			out[i] = a[i] - static_cast<T>(b[i]);
+			out[i] = a[i] - b[i];
 		}
 
 		return out;

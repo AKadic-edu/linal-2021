@@ -21,12 +21,15 @@ int g_grey { 100 };
 
 ml::Vector<float, 2> g_i { 1.0f, 0.0f };
 ml::Vector<float, 2> g_j { 0.0f, 1.0f };
-
-ml::Vector<float, 2> g_v { 1.50f, 0.0f };
-ml::Vector<float, 2> g_w { 0.0f , 0.6f };
-ml::Matrix<float, 2, 2> g_m { g_v, g_w };
-
-ml::Vector<float, 2> g_scalar { 3.0f, -2.0f };
+ml::Matrix<float, 2, 2> g_rotation { ml::Vector<float, 2>
+	{  0.0f, 1.0f },
+	{ -1.0f, 0.0f }
+};
+ml::Matrix<float, 2, 2> g_shear { ml::Vector<float, 2>
+	{  1.0f, 0.0f },
+	{  1.0f, 1.0f }
+};
+ml::Vector<float, 2> g_vector { 1.0f, 1.0f };
 					 
 
 void drawAxis(vl::Renderer& renderer)
@@ -76,22 +79,29 @@ void draw(vl::Renderer& renderer)
 	drawGrid(renderer);
 	drawAxis(renderer);
 
-	renderer.color(0, 255, 0);
+	renderer.color(0, g_grey, 0);
 	drawVector(renderer, g_i);
-	renderer.color(255, 0, 0);
+	renderer.color(g_grey, 0, 0);
 	drawVector(renderer, g_j);
 
+	renderer.color(g_grey, g_grey, 0);
+	drawVector(renderer, g_vector);
+
+	auto m = g_shear * g_rotation;
+
+	renderer.color(0, 255, 0);
+	drawVector(renderer, m * g_i);
+	renderer.color(255, 0, 0);
+	drawVector(renderer, m * g_j);
+
 	renderer.color(255, 255, 0);
-	drawVector(renderer, g_m * g_scalar);
+	drawVector(renderer, m * g_vector);
 }
 
 int main(int argc, char* argv[])
 {
 	vl::Window window { 640, 480 };
 	vl::Instance instance { window };
-
-	g_i = g_m * (g_scalar[0] * g_i);
-	g_j = g_m * (g_scalar[1] * g_j);
 
 	return instance.run([&](vl::Renderer& renderer) {
 		draw(renderer);
