@@ -1,13 +1,15 @@
 #include "week2.hpp"
 
+#include <mathlib/matrix.hpp>
+#include <videolib/shapes/line.hpp>
+#include <videolib/shapes/rectangle.hpp>
 #include <videolib/instance.hpp>
 #include <videolib/key.hpp>
 #include <videolib/renderer.hpp>
 #include <videolib/window.hpp>
-#include <videolib/shapes/line.hpp>
 
-int g_xSteps { 20 };
-int g_ySteps { 20 };
+int g_xSteps { 10 };
+int g_ySteps { 10 };
 
 float g_xSlope { 1.0f / g_xSteps };
 float g_ySlope { 1.0f / g_ySteps };
@@ -15,18 +17,28 @@ float g_ySlope { 1.0f / g_ySteps };
 vl::Line g_hAxis { -1.0f, 0, 1.0f, 0 };
 vl::Line g_vAxis { 0, -1.0f, 0, 1.0f };
 
-int g_grey { 200 };
+int g_grey { 100 };
+
+ml::Vector<float, 2> g_i { 1.0f, 0.0f };
+ml::Vector<float, 2> g_j { 0.0f, 1.0f };
+
+ml::Vector<float, 2> g_v { 1.50f, 0.0f };
+ml::Vector<float, 2> g_w { 0.0f , 0.6f };
+ml::Matrix<float, 2, 2> g_m { g_v, g_w };
+
+ml::Vector<float, 2> g_scalar { 3.0f, -2.0f };
+					 
 
 void drawAxis(vl::Renderer& renderer)
 {
-	renderer.setColor(0, 0, 0);
+	renderer.color(255, 255, 255);
 	renderer.drawLine(g_hAxis);
 	renderer.drawLine(g_vAxis);
 }
 
 void drawGrid(vl::Renderer& renderer)
 {
-	renderer.setColor(g_grey, g_grey, g_grey);
+	renderer.color(g_grey, g_grey, g_grey);
 
 	std::vector<vl::Line> lines;
 
@@ -52,25 +64,36 @@ void drawVector(vl::Renderer& renderer, const ml::Vector<float, 2>& v)
 	renderer.drawLine(l);
 }
 
+void update()
+{
+
+}
+
+void draw(vl::Renderer& renderer)
+{
+	renderer.clear();
+
+	drawGrid(renderer);
+	drawAxis(renderer);
+
+	renderer.color(0, 255, 0);
+	drawVector(renderer, g_i);
+	renderer.color(255, 0, 0);
+	drawVector(renderer, g_j);
+
+	renderer.color(255, 255, 0);
+	drawVector(renderer, g_m * g_scalar);
+}
+
 int main(int argc, char* argv[])
 {
 	vl::Window window { 640, 480 };
 	vl::Instance instance { window };
 
-	ml::Vector<float, 2> vector { 0.0f, 0.0f };
-
-	instance.onMouseMove([&](float x, float y) {
-		vector[0] = x * g_xSteps / 2;
-		vector[1] = y * g_ySteps / 2;
-	});
+	g_i = g_m * (g_scalar[0] * g_i);
+	g_j = g_m * (g_scalar[1] * g_j);
 
 	return instance.run([&](vl::Renderer& renderer) {
-		renderer.clear(255, 255, 255);
-
-		drawGrid(renderer);
-		drawAxis(renderer);
-
-		renderer.setColor(255, 0, 0);
-		drawVector(renderer, vector);
+		draw(renderer);
 	});
 }

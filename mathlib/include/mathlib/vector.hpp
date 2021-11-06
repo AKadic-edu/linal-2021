@@ -16,10 +16,37 @@ namespace ml {
 		{
 			return v[index];
 		}
+		constexpr bool operator==(Vector a) const
+		{
+			for (size_t i { 0 }; i < N; ++i) {
+				if (v[i] != a[i]) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+		constexpr void operator+=(Vector a)
+		{
+			for (size_t i { 0 }; i < N; ++i) {
+				v[i] += a[i];
+			}
+		}
+		template<typename S>
+		constexpr operator Vector<S, N>() const
+		{
+			Vector<S, N> out;
+
+			for (size_t i{ 0 }; i < N; ++i) {
+				out[i] = static_cast<S>(v[i]);
+			}
+
+			return out;
+		}
 	};
 
-	template<typename T, typename S, size_t N>
-	constexpr Vector<T, N> operator+(const Vector<T, N>& a, const Vector<S, N>& b)
+	template<typename T, typename U, size_t N>
+	constexpr Vector<T, N> operator+(const Vector<T, N>& a, const Vector<U, N>& b)
 	{
 		Vector<T, N> out;
 
@@ -29,8 +56,8 @@ namespace ml {
 
 		return out;
 	}
-	template<typename T, typename S, size_t N>
-	constexpr Vector<T, N> operator-(const Vector<T, N>& a, const Vector<S, N>& b)
+	template<typename T, typename U, size_t N>
+	constexpr Vector<T, N> operator-(const Vector<T, N>& a, const Vector<U, N>& b)
 	{
 		Vector<T, N> out;
 
@@ -40,13 +67,13 @@ namespace ml {
 
 		return out;
 	}
-	template<typename T, typename S, size_t N>
-	constexpr Vector<T, N> operator*(T scalar, const Vector<S, N>& v)
+	template<typename T, size_t N>
+	constexpr Vector<T, N> operator*(T scalar, const Vector<T, N>& v)
 	{
 		Vector<T, N> out;
 
-		for (size_t i { 0 }; i < N; ++i) {
-			out[i] = scalar * static_cast<T>(v[i]);
+		for (size_t i{ 0 }; i < N; ++i) {
+			out[i] = scalar * v[i];
 		}
 
 		return out;
