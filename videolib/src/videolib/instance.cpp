@@ -5,6 +5,7 @@
 #include "include/videolib/key.hpp"
 #include "include/videolib/renderer.hpp"
 #include "include/videolib/window.hpp"
+#include "src/videolib/utils/coordinate_helper.hpp"
 
 vl::Instance::~Instance() = default;
 
@@ -13,6 +14,8 @@ vl::Instance::Instance(Window& window)
     , m_rendererHandle { nullptr }
     , m_windowHandle { nullptr }
     , m_running { true }
+    , m_mouseHold { false }
+    , m_mouse { 0.0f, 0.0f }
 { }
 
 int vl::Instance::run(std::function<void(Renderer&)> cb)
@@ -35,16 +38,31 @@ void vl::Instance::onKeyDown(KeyHandler h)
     m_keyHandlers.push_back(h);
 }
 
+void vl::Instance::onMouseDown(MouseHandler h)
+{
+    m_mouseDownHandlers.push_back(h);
+}
+
+void vl::Instance::onMouseHold(MouseHandler h)
+{
+    m_mouseHoldHandlers.push_back(h);
+}
+
 void vl::Instance::onMouseMove(MouseHandler h)
 {
-    m_mouseHandlers.push_back(h);
+    m_mouseMoveHandlers.push_back(h);
+}
+
+void vl::Instance::onMouseUp(MouseHandler h)
+{
+    m_mouseUpHandlers.push_back(h);
 }
 
 void vl::Instance::setup()
 {
     m_windowHandle = SDL_CreateWindow
     (
-        "Week 2",
+        m_window.title.c_str(),
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         m_window.width,
@@ -65,8 +83,14 @@ void vl::Instance::pollInput()
         case SDL_KEYDOWN:
             handleKeyDown(e.key);
             break;
+        case SDL_MOUSEBUTTONDOWN:
+            handleMouseDown(e.button);
+            break;
         case SDL_MOUSEMOTION:
             handleMouseMove(e.motion);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            handleMouseUp(e.button);
             break;
         case SDL_WINDOWEVENT:
         {
@@ -93,6 +117,10 @@ void vl::Instance::pollInput()
             break;
         }
     }
+
+    if (m_mouseHold) {
+        handleMouseHold(m_mouse[0], m_mouse[1]);
+    }
 }
 
 void vl::Instance::render()
@@ -114,20 +142,62 @@ void vl::Instance::handleKeyDown(const SDL_KeyboardEvent& e)
     }
 }
 
+void vl::Instance::handleMouseDown(const SDL_MouseButtonEvent& e)
+{
+    m_mouseHold = true;
+
+    auto relative = CoordinateHelper::toRelative(viewport(), { e.x, e.y });
+
+    for (auto& h : m_mouseDownHandlers) {
+        h(relative[0], relative[1]);
+    }
+}
+
+void vl::Instance::handleMouseHold(float x, float y)
+{
+    for (auto& h : m_mouseHoldHandlers) {
+        h(x, y);
+    }
+}
+
 void vl::Instance::handleMouseMove(const SDL_MouseMotionEvent& e)
 {
-    float normalizedX { -1.0f + 2.0f * (static_cast<float>(e.x) / m_window.width) };
-    float normalizedY { 1.0f - 2.0f * (static_cast<float>(e.y) / m_window.height) };
+    auto relative = CoordinateHelper::toRelative(viewport(), { e.x, e.y });
 
-    for (auto& h: m_mouseHandlers) {
-        h(normalizedX, normalizedY);
+    m_mouse = relative;
+
+    for (auto& h: m_mouseMoveHandlers) {
+        h(relative[0], relative[1]);
     }
+}
+
+void vl::Instance::handleMouseUp(const SDL_MouseButtonEvent& e)
+{
+    m_mouseHold = false;
+
+    auto relative = CoordinateHelper::toRelative(viewport(), { e.x, e.y });
+
+    for (auto& h : m_mouseUpHandlers) {
+        h(relative[0], relative[1]);
+    }
+}
+
+ml::Vector<float, 2> vl::Instance::mouse() const
+{
+    return m_mouse;
 }
 
 vl::Key vl::Instance::convertKey(SDL_Keycode key) const
 {
+    if (key == SDLK_h) return vl::Key::h;
+    if (key == SDLK_j) return vl::Key::j;
     if (key == SDLK_k) return vl::Key::k;
     if (key == SDLK_l) return vl::Key::l;
 
     throw std::exception { "Key not mapped"};
+}
+
+ml::Vector<int, 2> vl::Instance::viewport() const
+{
+    return { m_window.width, m_window.height };
 }

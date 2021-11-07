@@ -99,7 +99,7 @@ void draw(vl::Renderer& renderer)
 
 int main(int argc, char* argv[])
 {
-	vl::Window window { 640, 480 };
+	vl::Window window { "Week2", 640, 480};
 	vl::Instance instance { window };
 
 	return instance.run([&](vl::Renderer& renderer) {

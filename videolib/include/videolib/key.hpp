@@ -5,6 +5,8 @@
 
 namespace vl {
 	enum class Key {
+		h,
+		j,
 		k,
 		l
 	};

@@ -38,7 +38,7 @@ namespace ml {
 			Vector<S, N> out;
 
 			for (size_t i { 0 }; i < N; ++i) {
-				out[i] = v[i];
+				out[i] = static_cast<S>(v[i]);
 			}
 
 			return out;

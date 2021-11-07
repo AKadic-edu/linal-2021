@@ -8,6 +8,18 @@
 
 namespace ml {
 	template<typename T, size_t N, size_t M>
+	constexpr Matrix<T, M, N> identity()
+	{
+		Matrix<T, M, N> out;
+
+		for (auto i { 0 }; i < N; ++i) {
+			out[i][i] = static_cast<T>(1);
+		}
+
+		return out;
+	}
+
+	template<typename T, size_t N, size_t M>
 	constexpr Matrix<T, M, N> transpose(const Matrix<T, N, M>& m)
 	{
 		Matrix<T, M, N> out;

@@ -2,7 +2,7 @@
 
 #include "mathlib.hpp"
 
-TEST_CASE("1x2 matrix") {
+TEST_CASE("2x1 matrix") {
 	SECTION("can be multiplied") {
 		SECTION("by vector") {
 			// Arrange

@@ -9,3 +9,4 @@ add_subdirectory("videolib")
 
 add_subdirectory("assignments/week1")
 add_subdirectory("assignments/week2")
+add_subdirectory("assignments/final")

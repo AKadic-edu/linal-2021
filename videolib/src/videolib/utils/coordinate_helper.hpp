@@ -9,6 +9,7 @@ namespace vl {
     class CoordinateHelper {
     public:
         static ml::Vector<int, 2> toPixels(ml::Vector<int, 2>, ml::Vector<float, 2>);
+        static ml::Vector<float, 2> toRelative(ml::Vector<int, 2>, ml::Vector<int, 2>);
     };
 }
 

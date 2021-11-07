@@ -5,9 +5,11 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 
 namespace vl {
 	struct Window {
+		std::string title;
 		int width;
 		int height;
 	};
