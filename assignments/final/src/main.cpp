@@ -34,8 +34,14 @@ int main()
 	});
 
 	instance.onMouseHold([&](float x, float y) {
-		camera[0] = -(x - dragOrigin[0]) * width;
-		camera[1] = -(y - dragOrigin[1]) * height;
+		auto diffX = x - dragOrigin[0];
+		auto diffY = y - dragOrigin[1];
+
+		if (diffX == 0 && diffY == 0) return;
+
+		camera[0] += -diffX * width;
+		camera[1] += -diffY * height;
+		dragOrigin = { x, y };
 	});
 
 	return instance.run([&](vl::Renderer& r) {
