@@ -1,9 +1,10 @@
-#include <mathlib/utils/operations.hpp>
 #include <mathlib/vector.hpp>
+#include <mathlib/utils/operations.hpp>
 #include <videolib/instance.hpp>
 #include <videolib/renderer.hpp>
 #include <videolib/window.hpp>
 #include <videolib/shapes/line.hpp>
+#include <videolib/shapes/rectangle.hpp>
 
 #include <iostream>
 
@@ -29,10 +30,6 @@ int main()
 
 	ml::Vector<float, 2> dragOrigin;
 
-	auto scale = ml::identity<float, 3, 3>();
-	scale[0][0] = 1.0f / width;
-	scale[1][1] = 1.0f / height;
-
 	instance.onMouseDown([&](float x, float y) {
 		dragOrigin = { x, y };
 	});
@@ -42,21 +39,28 @@ int main()
 
 		//auto newPos = ml::inverse(scale) * diff;
 
-		camera[0] -= diff[0] * width;
-		camera[1] -= diff[1] * height;
+		camera[0] += diff[0] * width;
+		camera[1] += diff[1] * height;
 		dragOrigin = { x, y };
+	});
+
+	instance.onMouseScroll([&](float x, float y) {
 	});
 
 	return instance.run([&](vl::Renderer& r) {
 		r.clear();
 
-		auto translation = ml::identity<float, 3, 3>();
-		translation[2][0] = -camera[0];
-		translation[2][1] = -camera[1];
+		auto scaleM = ml::identity<float, 3, 3>();
+		scaleM[0][0] = 1.0f / width;
+		scaleM[1][1] = 1.0f / height;
+
+		auto translationM = ml::identity<float, 3, 3>();
+		translationM[2][0] = camera[0];
+		translationM[2][1] = camera[1];
 
 		std::vector<ml::Vector<float, 2>> tmp { vertices };
 		for (auto& v : tmp) {
-			auto u = scale * translation * ml::Vector<float, 3> { v[0], v[1], 1.0f };
+			auto u = scaleM * translationM * ml::Vector<float, 3> { v[0], v[1], 1.0f };
 
 			v = { u[0], u[1] };
 		}
@@ -64,5 +68,11 @@ int main()
 		r.color(255, 255, 255);
 		r.drawLine({ -1.0f, tmp[0][1], 1.0f, tmp[1][1] });
 		r.drawLine({ tmp[0][0], -1.0f, tmp[1][0], 1.0f });
+
+		auto pos = scaleM * translationM * ml::Vector<float, 3> { 0.0f, 0.0f, 1.0f };
+		auto size = scaleM * ml::Vector<float, 3> { 1.0f, 1.0f, 1.0f };
+
+		r.color(255, 0, 0);
+		r.drawRectangle({ pos[0], pos[1], size[0], size[1] });
 	});
 }

@@ -53,6 +53,11 @@ void vl::Instance::onMouseMove(MouseHandler h)
     m_mouseMoveHandlers.push_back(h);
 }
 
+void vl::Instance::onMouseScroll(MouseHandler h)
+{
+    m_mouseScrollHandlers.push_back(h);
+}
+
 void vl::Instance::onMouseUp(MouseHandler h)
 {
     m_mouseUpHandlers.push_back(h);
@@ -88,6 +93,9 @@ void vl::Instance::pollInput()
             break;
         case SDL_MOUSEMOTION:
             handleMouseMove(e.motion);
+            break;
+        case SDL_MOUSEWHEEL:
+            handleMouseScroll(e.wheel);
             break;
         case SDL_MOUSEBUTTONUP:
             handleMouseUp(e.button);
@@ -168,6 +176,16 @@ void vl::Instance::handleMouseMove(const SDL_MouseMotionEvent& e)
 
     for (auto& h: m_mouseMoveHandlers) {
         h(relative[0], relative[1]);
+    }
+}
+
+void vl::Instance::handleMouseScroll(const SDL_MouseWheelEvent& e)
+{
+    auto x = static_cast<float>(e.x);
+    auto y = static_cast<float>(e.y);
+
+    for (auto& h : m_mouseScrollHandlers) {
+        h(x, y);
     }
 }
 

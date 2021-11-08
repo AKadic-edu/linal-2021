@@ -14,6 +14,7 @@
 struct SDL_KeyboardEvent;
 struct SDL_MouseButtonEvent;
 struct SDL_MouseMotionEvent;
+struct SDL_MouseWheelEvent;
 struct SDL_Renderer;
 struct SDL_Window;
 
@@ -39,6 +40,7 @@ namespace vl {
         void onMouseDown(MouseHandler);
         void onMouseHold(MouseHandler);
         void onMouseMove(MouseHandler);
+        void onMouseScroll(MouseHandler);
         void onMouseUp(MouseHandler);
 
         ml::Vector<float, 2> mouse() const;
@@ -56,6 +58,7 @@ namespace vl {
             m_mouseDownHandlers,
             m_mouseHoldHandlers,
             m_mouseMoveHandlers,
+            m_mouseScrollHandlers,
             m_mouseUpHandlers;
         bool m_mouseHold;
         ml::Vector<float, 2> m_mouse;
@@ -69,6 +72,7 @@ namespace vl {
         void handleMouseDown(const SDL_MouseButtonEvent&);
         void handleMouseHold(float x, float y);
         void handleMouseMove(const SDL_MouseMotionEvent&);
+        void handleMouseScroll(const SDL_MouseWheelEvent&);
         void handleMouseUp(const SDL_MouseButtonEvent&);
 
         vl::Key convertKey(signed int) const;

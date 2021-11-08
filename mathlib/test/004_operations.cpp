@@ -28,7 +28,7 @@ TEST_CASE("Matrix operations") {
 		SECTION("2x2 matrix") {
 			// Arrange
 			float expected = 1.0f * 4.0f - 3.0f * 2.0f;
-			ml::Matrix<float, 2, 2> m{ ml::Vector<float, 2>
+			ml::Matrix<float, 2, 2> m { ml::Vector<float, 2>
 				{ 1.0f, 2.0f },
 				{ 3.0f, 4.0f },
 			};
@@ -42,6 +42,7 @@ TEST_CASE("Matrix operations") {
 
 		SECTION("3x3 matrix") {
 			// Arrange
+			auto expected = 0.0f;
 			ml::Matrix<float, 3, 3> m { ml::Vector<float, 3>
 				{ 1.0f, 2.0f, 3.0f },
 				{ 4.0f, 5.0f, 6.0f },
@@ -59,10 +60,6 @@ TEST_CASE("Matrix operations") {
 				{ m[0][1], m[0][2] },
 				{ m[1][1], m[1][2] }
 			};
-			auto expected =
-				  m[0][0] * ml::determinant(m1)
-				- m[1][0] * ml::determinant(m2)
-				+ m[2][0] * ml::determinant(m3);
 
 			// Act
 			auto result = ml::determinant(m);
