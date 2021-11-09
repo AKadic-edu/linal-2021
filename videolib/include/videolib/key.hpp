@@ -8,7 +8,12 @@ namespace vl {
 		h,
 		j,
 		k,
-		l
+		l,
+
+		down,
+		left,
+		right,
+		up
 	};
 }
 
