@@ -55,13 +55,3 @@ void vl::Renderer::color(int r, int g , int b, int a)
     SDL_SetRenderDrawColor(&m_rendererHandle, r, g, b, a);
 }
 
-
-void vl::Renderer::drawRectangle(const Rectangle& r)
-{
-    const auto window = ml::Vector<int, 2> { m_window.width, m_window.height };
-    const auto position = CoordinateHelper::toPixels(window, { r.x, r.y });
-    const auto size = CoordinateHelper::toPixels(window, { r.width, r.height });
-    SDL_Rect rectangle { position[0] - size[0] / 2, position[1] - size[1] / 2, size[0], size[1] };
-
-    SDL_RenderDrawRect(&m_rendererHandle, &rectangle);
-}

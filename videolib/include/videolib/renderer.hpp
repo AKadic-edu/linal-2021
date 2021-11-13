@@ -11,7 +11,6 @@ struct SDL_Renderer;
 
 namespace vl {
 	struct Line;
-	struct Rectangle;
 	struct Window;
 
 	class Renderer {
@@ -26,7 +25,6 @@ namespace vl {
 		void clear(int = 0, int = 0, int = 0, int = 0);
 		void drawLine(const Line&);
 		void drawLines(const std::vector<Line>&);
-		void drawRectangle(const Rectangle&);
 		void color(int, int, int, int = 255);
 	private:
 		SDL_Renderer& m_rendererHandle;

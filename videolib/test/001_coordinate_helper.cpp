@@ -1,7 +1,6 @@
 #include "src/videolib/utils/coordinate_helper.hpp"
 
-#include "videolib.hpp"
-
+#include <catch2/catch.hpp>
 #include <mathlib/vector.hpp>
 
 typedef std::vector<std::tuple<std::string, ml::Vector<float, 2>, std::string, ml::Vector<int, 2>>> TestCoordinates;

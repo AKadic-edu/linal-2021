@@ -3,7 +3,8 @@ set(PROJECT_TEST_NAME ${PROJECT_NAME}_tests)
 
 add_library(${PROJECT_NAME} STATIC
 	"src/videolib/instance.cpp"
-	"src/videolib/renderer.cpp" "src/videolib/utils/coordinate_helper.hpp" "src/videolib/utils/coordinate_helper.cpp" "test/001_coordinate_helper.cpp" "videolib.hpp")
+	"src/videolib/renderer.cpp"
+	"src/videolib/utils/coordinate_helper.cpp")
 
 target_include_directories(${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_LIST_DIR}

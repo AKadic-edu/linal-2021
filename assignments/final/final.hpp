@@ -12,6 +12,12 @@
 
 #include <SDL.h>
 
+#include <mathlib/matrix.hpp>
+#include <mathlib/vector.hpp>
+#include <mathlib/utils/operations.hpp>
+
+#include <vector>
+
 #ifdef _MSC_VER
 	#pragma warning ( pop )
 #endif

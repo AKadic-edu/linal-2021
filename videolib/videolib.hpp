@@ -10,12 +10,14 @@
 #pragma warning ( disable : ALL_CODE_ANALYSIS_WARNINGS )
 #endif
 
+#include <mathlib/vector.hpp>
+
+#include <SDL.h>
+
 #include <algorithm>
 #include <iterator>
 #include <utility>
-
-#include <catch2/catch.hpp>
-#include <SDL.h>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning ( pop )
