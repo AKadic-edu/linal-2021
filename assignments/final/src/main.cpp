@@ -72,11 +72,15 @@ int main(int argc, char* args[])
 
 	std::vector<ml::Vector<float, 2>> axisVertices { 2 };
 	Model quad;
+	quad.modelM[2][0] = 2.0f;
+	quad.modelM[2][1] = 2.0f;
+	quad.modelM[0][0] = 2.0f;
+	quad.modelM[1][1] = 2.0f;
 	quad.vertices = {
-		{ -5.5f,  5.0f },
-		{  5.5f,  5.0f },
-		{  5.5f, -5.0f },
-		{ -5.5f, -5.0f }
+		{ -1.0f,  1.0f },
+		{  1.0f,  1.0f },
+		{  1.0f, -1.0f },
+		{ -1.0f, -1.0f }
 	};
 
 	return instance.run([&](vl::Renderer& r) {

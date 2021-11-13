@@ -3,10 +3,19 @@
 #ifndef MATHLIB_OPERATIONS_H
 #define MATHLIB_OPERATIONS_H
 
+#include <cmath>
+
 #include "../matrix.hpp"
 #include "../vector.hpp"
 
 namespace ml {
+	const double pi = std::atan(1) * 4;
+
+	constexpr double radians(double a)
+	{
+		return (a / 180.0) * pi;
+	}
+
 	template<typename T>
 	constexpr T determinant(const Matrix<T, 2, 2>& m)
 	{
@@ -15,23 +24,22 @@ namespace ml {
 	template<typename T>
 	constexpr T determinant(const Matrix<T, 3, 3>& m)
 	{
-		ml::Matrix<float, 2, 2> m1{ ml::Vector<float, 2>
+		ml::Matrix<float, 2, 2> m1 { ml::Vector<float, 2>
 			{ m[1][1], m[1][2] },
 			{ m[2][1], m[2][2] }
 		};
-		ml::Matrix<float, 2, 2> m2{ ml::Vector<float, 2>
+		ml::Matrix<float, 2, 2> m2 { ml::Vector<float, 2>
 			{ m[0][1], m[0][2] },
 			{ m[2][1], m[2][2] }
 		};
-		ml::Matrix<float, 2, 2> m3{ ml::Vector<float, 2>
+		ml::Matrix<float, 2, 2> m3 { ml::Vector<float, 2>
 			{ m[0][1], m[0][2] },
 			{ m[1][1], m[1][2] }
 		};
 
-		return
-			  m[0][0] * ml::determinant(m1)
-			- m[1][0] * ml::determinant(m2)
-			+ m[2][0] * ml::determinant(m3);
+		return m[0][0] * ml::determinant(m1)
+			 - m[1][0] * ml::determinant(m2)
+			 + m[2][0] * ml::determinant(m3);
 	}
 
 	template<typename T, size_t N>

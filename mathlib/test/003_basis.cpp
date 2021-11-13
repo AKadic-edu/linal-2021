@@ -1,5 +1,7 @@
 #include <mathlib/matrix.hpp>
 #include <mathlib/vector.hpp>
+#include <mathlib/utils/operations.hpp>
+#include <mathlib/utils/transforms.hpp>
 
 #include "mathlib.hpp"
 
@@ -20,6 +22,7 @@ TEST_CASE("Basis") {
 			REQUIRE(c == expected);
 		}
 	}
+
 	SECTION("basis matrix") {
 		SECTION("can be multiplied by vector") {
 			// Arrange
@@ -58,6 +61,25 @@ TEST_CASE("Basis") {
 
 			// Act
 			auto result = m * basis;
+
+			// Assert
+			REQUIRE(result == expected);
+		}
+
+		SECTION("can be rotated 90 deg") {
+			// Arrange
+			ml::Matrix<float, 2, 2> expected { ml::Vector<float, 2>
+				{ 0.0f, -1.0f },
+				{ 1.0f,  0.0f }
+			};
+			ml::Matrix<float, 2, 2> basis { ml::Vector<float, 2>
+				{ 1.0f, 0.0f },
+				{ 0.0f, 1.0f }
+			};
+			float rotation = -90.0f;
+
+			// Act
+			auto result = ml::rotate(basis, rotation);
 
 			// Assert
 			REQUIRE(result == expected);
