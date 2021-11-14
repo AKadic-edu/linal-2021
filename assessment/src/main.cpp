@@ -45,14 +45,19 @@ int main(int argc, char* args[])
 	};
 
 	return instance.run([&](vl::Renderer& r) {
-		r.viewport(-1.0f, 1.0f, 1.0f, -1.0f);
-		r.clear(255, 255, 255);
-
 		r.viewport(-1.0f, 1.0f, 0.0f, 0.0f);
 		r.clear(255, 0, 0);
+		r.color(255, 255, 255);
+		drawModel(r, ml::identity<float, 3, 3>(), quad);
+
 		r.viewport(0.0f, 1.0f, 1.0f, 0.0f);
 		r.clear(0, 255, 0);
+		r.color(255, 255, 255);
+		drawModel(r, ml::identity<float, 3, 3>(), quad);
+
 		r.viewport(-1.0f, 0.0f, 1.0f, -1.0f);
 		r.clear(0, 0, 255);
+		r.color(255, 255, 255);
+		drawModel(r, ml::identity<float, 3, 3>(), quad);
 	});
 }

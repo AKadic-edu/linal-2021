@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include <mathlib/matrix.hpp>
 #include <mathlib/vector.hpp>
 
 struct SDL_Renderer;
@@ -31,7 +32,9 @@ namespace vl {
 	private:
 		const Window& m_window;
 		SDL_Renderer& m_rendererHandle;
-		ml::Vector<float, 2> m_viewport[2];
+		ml::Matrix<int, 2, 2> m_viewport;
+
+		ml::Vector<int, 2> convert(const ml::Vector<float, 2>&) const;
 	};
 }
 

@@ -9,8 +9,6 @@
 #include "src/camera.hpp"
 #include "src/model.hpp"
 
-#include <iostream>
-
 ml::Vector<float, 2> dragOrigin;
 
 Camera camera;
@@ -23,7 +21,7 @@ void drawModel(vl::Renderer& r, ml::Matrix<float, 3, 3> vp, Model m)
 		const auto& a = m.vertices[i];
 		const auto& b = m.vertices[(i + 1) % m.vertices.size()];
 
-		const auto aTransformed = vp * m.modelM* ml::Vector<float, 3> { a[0], a[1], 1.0f };
+		const auto aTransformed = vp * m.modelM * ml::Vector<float, 3> { a[0], a[1], 1.0f };
 		const auto bTransformed = vp * m.modelM * ml::Vector<float, 3> { b[0], b[1], 1.0f };
 
 		lines.push_back({ aTransformed[0], aTransformed[1], bTransformed[0], bTransformed[1] });
@@ -84,6 +82,7 @@ int main(int argc, char* args[])
 	};
 
 	return instance.run([&](vl::Renderer& r) {
+		r.viewport(-1.0f, 1.0f, 1.0f, -1.0f);
 		r.clear();
 
 		auto projection = camera.ortho();
