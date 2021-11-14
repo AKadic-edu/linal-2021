@@ -13,9 +13,11 @@
 #include <mathlib/vector.hpp>
 
 #include <SDL.h>
+#include <catch2/catch.hpp>
 
 #include <algorithm>
 #include <chrono>
+#include <tuple>
 #include <iterator>
 #include <utility>
 #include <vector>

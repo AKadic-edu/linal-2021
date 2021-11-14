@@ -1,4 +1,4 @@
-#include "final.hpp"
+#include "week3.hpp"
 
 #include <videolib/instance.hpp>
 #include <videolib/renderer.hpp>
@@ -39,7 +39,7 @@ int main(int argc, char* args[])
 	camera.top = 10.0f;
 	camera.bottom = -10.0f;
 
-	vl::Window window { "LINAL Final", 640, 480 };
+	vl::Window window { "LINAL Week3", 640, 480 };
 	vl::Instance instance { window };
 
 	instance.onKeyDown([&](vl::Key k) {

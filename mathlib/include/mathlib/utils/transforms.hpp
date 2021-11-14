@@ -15,10 +15,10 @@ namespace ml {
 	{
 		Matrix<T, M, N> rotationM;
 
-		rotationM[0][0] = (a == 90.0f || a == -90.0f) ? 0.0f : std::cos(radians(a));
-		rotationM[0][1] =  std::sin(radians(a));
-		rotationM[1][0] = -std::sin(radians(a));
-		rotationM[1][1] = (a == 90.0f || a == -90.0f) ? 0.0f : std::cos(radians(a));
+		rotationM[0][0] = (a == 90.0f || a == -90.0f) ? 0.0f : static_cast<float>(std::cos(radians(a)));
+		rotationM[0][1] =  static_cast<float>(std::sin(radians(a)));
+		rotationM[1][0] = -static_cast<float>(std::sin(radians(a)));
+		rotationM[1][1] = (a == 90.0f || a == -90.0f) ? 0.0f : static_cast<float>(std::cos(radians(a)));
 
 		return rotationM * m;
 	}

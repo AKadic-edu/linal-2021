@@ -66,11 +66,6 @@ void drawVector(vl::Renderer& renderer, const ml::Vector<float, 2>& v)
 	renderer.drawLine(l);
 }
 
-void update()
-{
-
-}
-
 void draw(vl::Renderer& renderer)
 {
 	renderer.clear();
