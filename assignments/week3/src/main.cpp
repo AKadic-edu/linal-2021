@@ -53,10 +53,11 @@ int main(int argc, char* args[])
 
 	instance.onMouseHold([&](float x, float y) {
 		ml::Vector<float, 3> diff { x - dragOrigin[0], y - dragOrigin[1], 1.0f };
+		auto aspect = (float)window.width / window.height;
 
 		//auto newPos = ml::inverse(projection) * diff;
 
-		camera.position[0] -= diff[0] * (camera.right - camera.left) / 2;
+		camera.position[0] -= diff[0] * ((camera.right - camera.left) * aspect) / 2;
 		camera.position[1] -= diff[1] * (camera.top - camera.bottom) / 2;
 		dragOrigin = { x, y };
 	});
@@ -87,7 +88,8 @@ int main(int argc, char* args[])
 		r.viewport(-1.0f, 1.0f, 1.0f, -1.0f);
 		r.clear();
 
-		auto projection = camera.ortho();
+		auto aspect = (float)window.width / window.height;
+		auto projection = camera.ortho(aspect);
 		auto view = ml::identity<float, 3, 3>();
 		view[2][0] = -camera.position[0];
 		view[2][1] = -camera.position[1];
@@ -108,8 +110,11 @@ int main(int argc, char* args[])
 		float size = 0.015f;
 
 		for (int i = 0; i < 20; ++i) {
-			r.drawLine({ tmp[0][0] + ((float)i / camera.right), tmp[0][1] + size, tmp[1][0] + ((float)i / camera.right), tmp[1][1] - size });
-			r.drawLine({ tmp[0][0] + ((float)i / camera.left), tmp[0][1] + size, tmp[1][0] + ((float)i / camera.left), tmp[1][1] - size });
+			auto right = (float)i / (camera.right * aspect);
+			auto left = (float)i / (camera.left * aspect);
+
+			r.drawLine({ tmp[0][0] + right, tmp[0][1] + size, tmp[1][0] + right, tmp[1][1] - size });
+			r.drawLine({ tmp[0][0] + left, tmp[0][1] + size, tmp[1][0] + left, tmp[1][1] - size });
 		}
 		for (int i = 0; i < 20; ++i) {
 			r.drawLine({ tmp[0][0] + size, tmp[0][1] + ((float)i / camera.top), tmp[1][0] - size, tmp[1][1] + ((float)i / camera.top) });

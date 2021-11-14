@@ -13,7 +13,7 @@ struct Camera {
 	float right {};
 	ml::Vector<float, 2> position;
 
-	ml::Matrix<float, 3, 3> ortho() const;
+	ml::Matrix<float, 3, 3> ortho(float aspect) const;
 };
 
 #endif // !CAMERA_HPP
