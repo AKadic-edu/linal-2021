@@ -22,13 +22,16 @@ namespace vl {
 		Renderer& operator=(Renderer&&) = delete;
 		virtual ~Renderer() = default;
 
-		void clear(int = 0, int = 0, int = 0, int = 0);
+		void clear(int = 0, int = 0, int = 0, int = 255);
+		void color(int, int, int, int = 255);
+		void viewport(float x1, float y1, float x2, float y2);
+
 		void drawLine(const Line&);
 		void drawLines(const std::vector<Line>&);
-		void color(int, int, int, int = 255);
 	private:
-		SDL_Renderer& m_rendererHandle;
 		const Window& m_window;
+		SDL_Renderer& m_rendererHandle;
+		ml::Vector<float, 2> m_viewport[2];
 	};
 }
 
