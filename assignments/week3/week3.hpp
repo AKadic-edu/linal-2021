@@ -17,6 +17,7 @@
 #include <mathlib/utils/operations.hpp>
 #include <mathlib/utils/transforms.hpp>
 
+#include <cmath>
 #include <vector>
 
 #ifdef _MSC_VER

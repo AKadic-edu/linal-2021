@@ -62,10 +62,12 @@ int main(int argc, char* args[])
 	});
 
 	instance.onMouseScroll([&](float x, float y) {
-		camera.bottom -= y;
-		camera.top += y;
-		camera.left -= y;
-		camera.right += y;
+		int zoom = std::ceil(y);
+
+		camera.bottom -= zoom;
+		camera.top += zoom;
+		camera.left -= zoom;
+		camera.right += zoom;
 	});
 
 	std::vector<ml::Vector<float, 2>> axisVertices { 2 };
@@ -102,6 +104,17 @@ int main(int argc, char* args[])
 		r.color(255, 255, 255);
 		r.drawLine({ -1.0f, tmp[0][1], 1.0f, tmp[1][1] });
 		r.drawLine({ tmp[0][0], -1.0f, tmp[1][0], 1.0f });
+
+		float size = 0.015f;
+
+		for (int i = 0; i < 20; ++i) {
+			r.drawLine({ tmp[0][0] + ((float)i / camera.right), tmp[0][1] + size, tmp[1][0] + ((float)i / camera.right), tmp[1][1] - size });
+			r.drawLine({ tmp[0][0] + ((float)i / camera.left), tmp[0][1] + size, tmp[1][0] + ((float)i / camera.left), tmp[1][1] - size });
+		}
+		for (int i = 0; i < 20; ++i) {
+			r.drawLine({ tmp[0][0] + size, tmp[0][1] + ((float)i / camera.top), tmp[1][0] - size, tmp[1][1] + ((float)i / camera.top) });
+			r.drawLine({ tmp[0][0] + size, tmp[0][1] + ((float)i / camera.bottom), tmp[1][0] - size, tmp[1][1] + ((float)i / camera.bottom) });
+		}
 
 		r.color(255, 0, 0);
 		drawModel(r, vp, quad);
