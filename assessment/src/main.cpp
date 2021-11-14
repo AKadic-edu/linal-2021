@@ -7,6 +7,9 @@
 #include <videolib/window.hpp>
 #include <videolib/shapes/line.hpp>
 
+#include "src/camera.hpp"
+#include "src/view.hpp"
+
 struct Model {
 	ml::Matrix<float, 3, 3> modelM { ml::identity<float, 3, 3>() };
 	std::vector<ml::Vector<float, 2>> vertices;
@@ -35,8 +38,6 @@ int main(int argc, char* args[])
 	vl::Instance instance { window };
 
 	Model quad;
-	quad.modelM[0][0] = 0.5f;
-	quad.modelM[1][1] = 0.5f;
 	quad.vertices = {
 		{ -1.0f,  1.0f },
 		{  1.0f,  1.0f },
@@ -44,20 +45,58 @@ int main(int argc, char* args[])
 		{ -1.0f, -1.0f }
 	};
 
+	View topView { -1.0f, 1.0f, 0.0f, 0.0f };
+	View sideView { 0.0f, 1.0f, 1.0f, 0.0f };
+	View frontView { -1.0f, 0.0f, 1.0f, -1.0f };
+
+	Camera cam;
+	cam.left = -10.0f;
+	cam.right = 10.0f;
+	cam.top = 10.0f;
+	cam.bottom = -10.0f;
+
+	instance.onKeyDown([&](vl::Key k) {
+		if (k == vl::Key::right) ++cam.position[0];
+		if (k == vl::Key::left) --cam.position[0];
+		if (k == vl::Key::down) --cam.position[1];
+		if (k == vl::Key::up) ++cam.position[1];
+	});
+
+	instance.onMouseScroll([&](float x, float y) {
+		int zoom = std::ceil(y);
+
+		cam.bottom -= zoom;
+		cam.top += zoom;
+		cam.left -= zoom;
+		cam.right += zoom;
+	});
+
 	return instance.run([&](vl::Renderer& r) {
-		r.viewport(-1.0f, 1.0f, 0.0f, 0.0f);
-		r.clear(255, 0, 0);
-		r.color(255, 255, 255);
-		drawModel(r, ml::identity<float, 3, 3>(), quad);
+		const auto projection = cam.ortho((float)window.width / window.height);
+		const auto view = cam.view();
 
-		r.viewport(0.0f, 1.0f, 1.0f, 0.0f);
-		r.clear(0, 255, 0);
-		r.color(255, 255, 255);
-		drawModel(r, ml::identity<float, 3, 3>(), quad);
+		topView.draw(r, [&](vl::Renderer& r) {
+			r.clear(255, 255, 255);
+			r.color(0, 0, 0);
+			drawModel(r, projection * view, quad);
+		});
 
-		r.viewport(-1.0f, 0.0f, 1.0f, -1.0f);
-		r.clear(0, 0, 255);
-		r.color(255, 255, 255);
-		drawModel(r, ml::identity<float, 3, 3>(), quad);
+		sideView.draw(r, [&](vl::Renderer& r) {
+			r.clear(255, 255, 255);
+			r.color(0, 0, 0);
+			drawModel(r, projection * view, quad);
+		});
+
+		frontView.draw(r, [&](vl::Renderer& r) {
+			const auto frontViewProjection = cam.ortho((float)window.width * 2 / window.height);
+
+			r.clear(255, 255, 255);
+			r.color(0, 0, 0);
+			drawModel(r, frontViewProjection * view, quad);
+		});
+
+		r.color(0, 0, 0);
+		r.drawLine({ -1.0f, 0.0f, 1.0f, 0.0f });
+		r.drawLine({ 0.0f, 0.0f, 0.0f, 1.0f });
 	});
 }
