@@ -15,6 +15,18 @@ struct Model {
 	std::vector<ml::Vector<float, 2>> vertices;
 };
 
+ml::Vector<float, 2> clip(const ml::Vector<float, 2>& v)
+{
+	auto out = v;
+
+	if (out[0] < -1.0f) out[0] = -1.0f;
+	if (out[1] < -1.0f) out[1] = -1.0f;
+	if (out[0] >  1.0f) out[0] =  1.0f;
+	if (out[1] >  1.0f) out[1] =  1.0f;
+
+	return out;
+}
+
 void drawModel(vl::Renderer& r, ml::Matrix<float, 3, 3> vp, Model m)
 {
 	std::vector<vl::Line> lines;
@@ -26,7 +38,10 @@ void drawModel(vl::Renderer& r, ml::Matrix<float, 3, 3> vp, Model m)
 		const auto aTransformed = vp * m.modelM * ml::Vector<float, 3> { a[0], a[1], 1.0f };
 		const auto bTransformed = vp * m.modelM * ml::Vector<float, 3> { b[0], b[1], 1.0f };
 
-		lines.push_back({ aTransformed[0], aTransformed[1], bTransformed[0], bTransformed[1] });
+		const auto aClipped = clip({ aTransformed[0], aTransformed[1] });
+		const auto bClipped = clip({ bTransformed[0], bTransformed[1] });
+
+		lines.push_back({ aClipped[0], aClipped[1], bClipped[0], bClipped[1] });
 	}
 
 	r.drawLines(lines);
