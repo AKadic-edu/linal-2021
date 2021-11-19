@@ -5,6 +5,8 @@
 
 #include <cmath>
 
+#include "helpers.hpp"
+
 #include "../matrix.hpp"
 #include "../vector.hpp"
 
@@ -57,6 +59,34 @@ namespace ml {
 
 		for (int i = 0; i < N; ++i) {
 			m[i][i] = static_cast<T>(1);
+		}
+
+		return m;
+	}
+	template<typename T, size_t N, size_t M>
+	constexpr Matrix<T, M, N> identity(const T& a)
+	{
+		Matrix<T, M, N> m;
+
+		for (int i = 0; i < N; ++i) {
+			if (m[i][i] == (T)(0)) {
+				m[i][i] = a;
+			}
+		}
+
+		return m;
+	}
+	template<typename T, size_t N, size_t M>
+	constexpr Matrix<T, M, N> identity(const Matrix<T, M - 1, N - 1>& a)
+	{
+		Matrix<T, M, N> b;
+
+		auto m = copy(b, a);
+
+		for (int i = 0; i < N; ++i) {
+			if (m[i][i] == (T)(0)) {
+				m[i][i] = (T)(1);
+			}
 		}
 
 		return m;
