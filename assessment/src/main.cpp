@@ -136,7 +136,8 @@ int main(int argc, char* args[])
 
 	View topView { -1.0f, 1.0f, 0.0f, 0.0f };
 	View sideView { 0.0f, 1.0f, 1.0f, 0.0f };
-	View frontView { -1.0f, 0.0f, 1.0f, -1.0f };
+	View frontView { -1.0f, 0.0f, 0.0f, -1.0f };
+	View freeView { 0.0f, 0.0f, 1.0f, -1.0f };
 
 	Camera<3> cam;
 	cam.up = { 0.0f, 1.0f, 0.0f };
@@ -151,6 +152,8 @@ int main(int argc, char* args[])
 	sideCam.position = { 3.0f, 0.0f, 0.0f };
 	Camera<3> frontCam = cam;
 	frontCam.position = { 0.0f, 0.0f, -3.0f };
+	Camera<3> freeCam = cam;
+	freeCam.position = { 3.0f, 3.0f, -3.0f };
 
 	instance.onKeyDown([&](vl::Key k) {
 		if (k == vl::Key::right) ++quad.modelM[3][0];
@@ -210,9 +213,25 @@ int main(int argc, char* args[])
 		});
 
 		frontView.draw(r, [&](vl::Renderer& r) {
-			const auto frontViewProjection = ortho(cam, (float)window.width * 2 / window.height);
 			const auto viewM = view(frontCam);
-			auto vp = frontViewProjection * viewM;
+			auto vp = projectionM * viewM;
+
+			r.clear(255, 255, 255);
+
+			r.color(255, 0, 0);
+			drawAxis(r, vp, { basis, 0.0f, 0.0f });
+			r.color(0, 255, 0);
+			drawAxis(r, vp, { 0.0f, basis, 0.0f });
+			r.color(0, 0, 255);
+			drawAxis(r, vp, { 0.0f, 0.0f, basis });
+
+			r.color(0, 0, 0);
+			drawModel(r, vp, quad);
+		});
+
+		freeView.draw(r, [&](vl::Renderer& r) {
+			const auto viewM = view(freeCam);
+			auto vp = projectionM * viewM;
 
 			r.clear(255, 255, 255);
 
@@ -229,6 +248,6 @@ int main(int argc, char* args[])
 
 		r.color(0, 0, 0);
 		r.drawLine({ -1.0f, 0.0f, 1.0f, 0.0f });
-		r.drawLine({ 0.0f, 0.0f, 0.0f, 1.0f });
+		r.drawLine({ 0.0f, -1.0f, 0.0f, 1.0f });
 	});
 }

@@ -45,6 +45,8 @@ ml::Matrix<float, 4, 4> view(const Camera<3>& c)
 	m[1] = { up[0], up[1], up[2], 0.0f };
 	m[2] = { forward[0], forward[1], forward[2], 0.0f };
 
+	m = ml::transpose(m);
+
 	m[3][0] = -c.position[0];
 	m[3][1] = -c.position[1];
 	m[3][2] = -c.position[2];
