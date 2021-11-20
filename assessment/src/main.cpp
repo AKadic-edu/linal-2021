@@ -150,13 +150,13 @@ int main(int argc, char* args[])
 	Camera<3> sideCam = cam;
 	sideCam.position = { 3.0f, 0.0f, 0.0f };
 	Camera<3> frontCam = cam;
-	frontCam.position = { 0.0f, 0.0f, 3.0f };
+	frontCam.position = { 0.0f, 0.0f, -3.0f };
 
 	instance.onKeyDown([&](vl::Key k) {
-		if (k == vl::Key::right) ++cam.position[0];
-		if (k == vl::Key::left) --cam.position[0];
-		if (k == vl::Key::down) --cam.position[2];
-		if (k == vl::Key::up) ++cam.position[2];
+		if (k == vl::Key::right) ++quad.modelM[3][0];
+		if (k == vl::Key::left) --quad.modelM[3][0];
+		if (k == vl::Key::down) --quad.modelM[3][2];
+		if (k == vl::Key::up) ++quad.modelM[3][2];
 	});
 
 	instance.onMouseScroll([&](float x, float y) {
