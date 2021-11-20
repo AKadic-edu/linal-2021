@@ -207,10 +207,32 @@ ml::Vector<float, 2> vl::Instance::mouse() const
 
 vl::Key vl::Instance::convertKey(SDL_Keycode key) const
 {
+    if (key == SDLK_a) return vl::Key::a;
+    if (key == SDLK_b) return vl::Key::b;
+    if (key == SDLK_c) return vl::Key::c;
+    if (key == SDLK_d) return vl::Key::d;
+    if (key == SDLK_e) return vl::Key::e;
+    if (key == SDLK_f) return vl::Key::f;
+    if (key == SDLK_g) return vl::Key::g;
     if (key == SDLK_h) return vl::Key::h;
+    if (key == SDLK_i) return vl::Key::i;
     if (key == SDLK_j) return vl::Key::j;
     if (key == SDLK_k) return vl::Key::k;
     if (key == SDLK_l) return vl::Key::l;
+    if (key == SDLK_m) return vl::Key::m;
+    if (key == SDLK_n) return vl::Key::n;
+    if (key == SDLK_o) return vl::Key::o;
+    if (key == SDLK_p) return vl::Key::p;
+    if (key == SDLK_q) return vl::Key::q;
+    if (key == SDLK_r) return vl::Key::r;
+    if (key == SDLK_s) return vl::Key::s;
+    if (key == SDLK_t) return vl::Key::t;
+    if (key == SDLK_u) return vl::Key::u;
+    if (key == SDLK_v) return vl::Key::v;
+    if (key == SDLK_w) return vl::Key::w;
+    if (key == SDLK_x) return vl::Key::x;
+    if (key == SDLK_y) return vl::Key::y;
+    if (key == SDLK_z) return vl::Key::z;
 
     if (key == SDLK_DOWN) return vl::Key::down;
     if (key == SDLK_LEFT) return vl::Key::left;

@@ -3,6 +3,7 @@
 #include <mathlib/matrix.hpp>
 #include <mathlib/vector.hpp>
 #include <mathlib/utils/operations.hpp>
+#include <mathlib/utils/transforms.hpp>
 #include <videolib/instance.hpp>
 #include <videolib/renderer.hpp>
 #include <videolib/window.hpp>
@@ -14,7 +15,7 @@
 float size = 2.0f;
 float minSize =  1.0f;
 float maxSize = 2.0f;
-float animationSpeed = 0.002f;
+float animationSpeed = 0.00002f;
 
 float vertices[] = {
 		-0.5f, -0.5f, -0.5f,
@@ -77,15 +78,17 @@ ml::Vector<float, 2> clip(const ml::Vector<float, 2>& v)
 	return out;
 }
 
+float rotation = 0.0f;
+
 Model animate(Model m)
 {
-	if (m.modelM[0][0] < minSize || m.modelM[0][0] > maxSize) {
-		animationSpeed = -animationSpeed;
-	}
+	//if (m.modelM[0][0] < minSize || m.modelM[0][0] > maxSize) {
+	//	animationSpeed = -animationSpeed;
+	//}
 
-	m.modelM[0][0] += animationSpeed;
-	m.modelM[1][1] += animationSpeed;
-	m.modelM[2][2] += animationSpeed;
+	//m.modelM[0][0] += animationSpeed;
+	//m.modelM[1][1] += animationSpeed;
+	//m.modelM[2][2] += animationSpeed;
 
 	return m;
 }
@@ -155,11 +158,24 @@ int main(int argc, char* args[])
 	Camera<3> freeCam = cam;
 	freeCam.position = { 3.0f, 3.0f, -3.0f };
 
+	float roll = 0.0f;
+	float pitch = 0.0f;
+	float yaw = 0.0f;
+
+	float rotationSpeed = 2.0f;
+
 	instance.onKeyDown([&](vl::Key k) {
 		if (k == vl::Key::right) ++quad.modelM[3][0];
 		if (k == vl::Key::left) --quad.modelM[3][0];
 		if (k == vl::Key::down) --quad.modelM[3][2];
 		if (k == vl::Key::up) ++quad.modelM[3][2];
+
+		if (k == vl::Key::q) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, rotationSpeed }) * quad.modelM;
+		if (k == vl::Key::e) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, -rotationSpeed }) * quad.modelM;
+		if (k == vl::Key::w) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
+		if (k == vl::Key::s) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { -rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
+		if (k == vl::Key::a) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, rotationSpeed, 0.0f }) * quad.modelM;
+		if (k == vl::Key::d) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, -rotationSpeed, 0.0f }) * quad.modelM;
 	});
 
 	instance.onMouseScroll([&](float x, float y) {
@@ -174,8 +190,6 @@ int main(int argc, char* args[])
 	float basis = 5.0f;
 
 	return instance.run([&](vl::Renderer& r) {
-		//quad = animate(quad);
-
 		const auto projectionM = ortho(cam, (float)window.width / window.height);
 
 		topView.draw(r, [&](vl::Renderer& r) {
