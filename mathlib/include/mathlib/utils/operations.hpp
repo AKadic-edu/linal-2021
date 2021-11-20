@@ -19,6 +19,16 @@ namespace ml {
 	}
 
 	template<typename T>
+	constexpr Vector<T, 3> cross(const Vector<T, 3>& a, const Vector<T, 3>& b)
+	{
+		return {
+			a[1] * b[2] - a[2] * b[1],
+			a[2] * b[0] - a[0] * b[2],
+			a[0] * b[1] - a[1] * b[0]
+		};
+	}
+
+	template<typename T>
 	constexpr T determinant(const Matrix<T, 2, 2>& m)
 	{
 		return m[0][0] * m[1][1] - m[1][0] * m[0][1];
@@ -45,7 +55,7 @@ namespace ml {
 	}
 
 	template<typename T, size_t N>
-	constexpr float dot(const Vector<T, N>& a, const Vector<T, N>& b)
+	constexpr T dot(const Vector<T, N>& a, const Vector<T, N>& b)
 	{
 		Matrix<T, N, 1> m { a };
 
@@ -100,6 +110,26 @@ namespace ml {
 
 
 		return m;
+	}
+
+	template<typename T, size_t N>
+	constexpr Vector<T, N> normalize(const Vector<T, N>& a)
+	{
+		auto m = magnitude(a);
+
+		return m > 0 ? ((T)1 / m) * a : a;
+	}
+
+	template<typename T, size_t N>
+	constexpr T magnitude(const Vector<T, N>& a)
+	{
+		T out { 0 };
+
+		for (int i = 0; i < N; ++i) {
+			out += a[i] * a[i];
+		}
+
+		return std::sqrt(out);
 	}
 
 	template<typename T, size_t N, size_t M>

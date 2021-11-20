@@ -6,6 +6,19 @@
 
 TEST_CASE("Operations") {
 	SECTION("Vector") {
+		SECTION("cross") {
+			// Arrange
+			ml::Vector<float, 3> expected { 54.0f, -8.0f, -52.0f };
+			ml::Vector<float, 3> a { 2.0f, 7.0f, 1.0f };
+			ml::Vector<float, 3> b { 8.0f, 2.0f, 8.0f };
+
+			// Act
+			auto result = ml::cross(a, b);
+
+			// Assert
+			REQUIRE(result == expected);
+		}
+
 		SECTION("dot") {
 			// Arrange
 			float expected = 2.0f * 8.0f + 7.0f * 2.0f + 1.0f * 8.0f;

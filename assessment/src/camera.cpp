@@ -35,7 +35,15 @@ ml::Matrix<float, 3, 3> view(const Camera<2>& c)
 
 ml::Matrix<float, 4, 4> view(const Camera<3>& c)
 {
+	auto forward = ml::normalize(c.position - c.target);
+	auto right = ml::normalize(ml::cross(c.up, forward));
+	auto up = ml::cross(forward, right);
+
 	auto m = ml::identity<float, 4, 4>();
+
+	m[0] = { right[0], right[1], right[2], 0.0f };
+	m[1] = { up[0], up[1], up[2], 0.0f };
+	m[2] = { forward[0], forward[1], forward[2], 0.0f };
 
 	m[3][0] = -c.position[0];
 	m[3][1] = -c.position[1];
