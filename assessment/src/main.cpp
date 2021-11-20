@@ -80,6 +80,31 @@ ml::Vector<float, 2> clip(const ml::Vector<float, 2>& v)
 }
 
 float rotation = 0.0f;
+float bulletScale = 0.5f;
+float xMax = 50.0f;
+float yMax = 50.0f;
+float zMax = 50.0f;
+
+bool outOfBounds(ml::Vector<float, 3> pos)
+{
+	return pos[0] > xMax || pos[0] < -xMax
+		|| pos[1] > yMax || pos[1] < -yMax
+		|| pos[2] > zMax || pos[2] < -zMax;
+}
+
+Model generateBullet(ml::Matrix<float, 4, 4> w, ml::Matrix<float, 4, 4> m)
+{
+	Model bullet;
+
+	for (int i = 0; i < sizeof(vertices) / sizeof(*vertices); i += 3) {
+		bullet.vertices.push_back({ vertices[i], vertices[i + 1], vertices[i + 2] });
+	}
+
+	bullet.modelM = m;
+	bullet.worldM = w;
+
+	return bullet;
+}
 
 Model animate(Model m)
 {
@@ -165,9 +190,14 @@ int main(int argc, char* args[])
 
 	float rotationSpeed = 2.0f;
 
+	std::vector<Model> bullets;
+
 	instance.onKeyDown([&](vl::Key k) {
 		if (k == vl::Key::shift) {
 			quad.worldM[3] = quad.worldM[3] + quad.modelM[2];
+		}
+		if (k == vl::Key::spacebar) {
+			bullets.push_back(generateBullet(quad.worldM, quad.modelM));
 		}
 
 		if (k == vl::Key::right) ++quad.modelM[3][0];
@@ -193,8 +223,21 @@ int main(int argc, char* args[])
 	});
 
 	float basis = 5.0f;
+	float bulletSpeed = 0.5f;
 
 	return instance.run([&](vl::Renderer& r) {
+		auto it = bullets.begin();
+		while (it != bullets.end()) {
+			auto& b = (*it);
+
+			b.worldM[3] = b.worldM[3] + (bulletSpeed * (b.modelM[2]));
+
+			if (outOfBounds({ b.worldM[3][0], b.worldM[3][1], b.worldM[3][2] })) {
+				it = bullets.erase(it);
+			}
+			else ++it;
+		}
+
 		const auto projectionM = ortho(cam, (float)window.width / window.height);
 
 		topView.draw(r, [&](vl::Renderer& r) {
@@ -212,6 +255,10 @@ int main(int argc, char* args[])
 
 			r.color(0, 0, 0);
 			drawModel(r, vp, quad);
+
+			for (auto& b : bullets) {
+				drawModel(r, vp, b);
+			}
 		});
 
 		sideView.draw(r, [&](vl::Renderer& r) {
@@ -229,6 +276,10 @@ int main(int argc, char* args[])
 
 			r.color(0, 0, 0);
 			drawModel(r, vp, quad);
+
+			for (auto& b : bullets) {
+				drawModel(r, vp, b);
+			}
 		});
 
 		frontView.draw(r, [&](vl::Renderer& r) {
@@ -246,6 +297,10 @@ int main(int argc, char* args[])
 
 			r.color(0, 0, 0);
 			drawModel(r, vp, quad);
+
+			for (auto& b : bullets) {
+				drawModel(r, vp, b);
+			}
 		});
 
 		freeView.draw(r, [&](vl::Renderer& r) {
@@ -263,6 +318,10 @@ int main(int argc, char* args[])
 
 			r.color(0, 0, 0);
 			drawModel(r, vp, quad);
+
+			for (auto& b : bullets) {
+				drawModel(r, vp, b);
+			}
 		});
 
 		r.color(0, 0, 0);

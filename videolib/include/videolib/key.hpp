@@ -37,7 +37,8 @@ namespace vl {
 		right,
 		up,
 
-		shift
+		shift,
+		spacebar
 	};
 }
 
