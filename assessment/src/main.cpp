@@ -62,6 +62,7 @@ float vertices[] = {
 };
 
 struct Model {
+	ml::Matrix<float, 4, 4> worldM { ml::identity<float, 4, 4>() };
 	ml::Matrix<float, 4, 4> modelM { ml::identity<float, 4, 4>() };
 	std::vector<ml::Vector<float, 3>> vertices;
 };
@@ -112,8 +113,8 @@ void drawModel(vl::Renderer& r, ml::Matrix<float, 4, 4> vp, Model m)
 		const auto& a = m.vertices[i];
 		const auto& b = m.vertices[(i + 1) % m.vertices.size()];
 
-		const auto aTransformed = vp * m.modelM * ml::Vector<float, 4> { a[0], a[1], a[2], 1.0f };
-		const auto bTransformed = vp * m.modelM * ml::Vector<float, 4> { b[0], b[1], b[2], 1.0f };
+		const auto aTransformed = vp * m.worldM * m.modelM * ml::Vector<float, 4> { a[0], a[1], a[2], 1.0f };
+		const auto bTransformed = vp * m.worldM * m.modelM * ml::Vector<float, 4> { b[0], b[1], b[2], 1.0f };
 
 		const auto aClipped = clip({ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] });
 		const auto bClipped = clip({ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] });
@@ -165,6 +166,10 @@ int main(int argc, char* args[])
 	float rotationSpeed = 2.0f;
 
 	instance.onKeyDown([&](vl::Key k) {
+		if (k == vl::Key::shift) {
+			quad.worldM[3] = quad.worldM[3] + quad.modelM[2];
+		}
+
 		if (k == vl::Key::right) ++quad.modelM[3][0];
 		if (k == vl::Key::left) --quad.modelM[3][0];
 		if (k == vl::Key::down) --quad.modelM[3][2];

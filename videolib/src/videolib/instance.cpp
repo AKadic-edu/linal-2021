@@ -238,6 +238,7 @@ vl::Key vl::Instance::convertKey(SDL_Keycode key) const
     if (key == SDLK_LEFT) return vl::Key::left;
     if (key == SDLK_RIGHT) return vl::Key::right;
     if (key == SDLK_UP) return vl::Key::up;
+    if (key == SDLK_LSHIFT) return vl::Key::shift;
 
     throw std::exception { "Key not mapped"};
 }
