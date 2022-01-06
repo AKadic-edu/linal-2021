@@ -32,6 +32,12 @@ namespace ml {
 				v[i] += a[i];
 			}
 		}
+		constexpr void operator-=(Vector a)
+		{
+			for (size_t i{ 0 }; i < N; ++i) {
+				v[i] -= a[i];
+			}
+		}
 		template<typename S>
 		constexpr operator Vector<S, N>() const
 		{

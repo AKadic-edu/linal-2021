@@ -25,13 +25,15 @@ ml::Matrix<float, 4, 4> ortho(const Camera<3>& c, float aspect)
 
 ml::Matrix<float, 4, 4> perspective(const Camera<3>& c, float far, float near, float fov)
 {
-	float s = 1.0f / std::tan((fov / 2.0f) * ml::pi / 180.0f);
-	auto m = ml::identity<float, 4, 4>(s);
+	float s = near * std::tan((fov * 0.5f) * ml::pi / 180.0f);
 
+	ml::Matrix<float, 4, 4> m;
+
+	m[0][0] = s;
+	m[1][1] = s;
 	m[2][2] = -far / (far - near);
-	m[3][2] = -far * near / (far - near);
-	m[2][3] = -1.0f;
-	m[3][3] = 0.0f;
+	m[2][3] = -far * near / (far - near);
+	m[3][2] = -1.0f;
 
 	return m;
 }
@@ -60,9 +62,11 @@ ml::Matrix<float, 4, 4> view(const Camera<3>& c)
 
 	m = ml::transpose(m);
 
-	m[3][0] = -c.position[0];
-	m[3][1] = -c.position[1];
-	m[3][2] = -c.position[2];
+	auto n = ml::identity<float, 4, 4>();
 
-	return m;
+	n[3][0] = -c.position[0];
+	n[3][1] = -c.position[1];
+	n[3][2] = -c.position[2];
+
+	return m * n;
 }

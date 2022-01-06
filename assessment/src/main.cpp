@@ -85,6 +85,17 @@ float xMax = 50.0f;
 float yMax = 50.0f;
 float zMax = 50.0f;
 
+ml::Vector<float, 3> position { 0.0f, 0.0f , 3.0f };
+ml::Vector<float, 3> front { 0.0f, 0.0f , -1.0f };
+ml::Vector<float, 3> up { 0.0f, 1.0f , 0.0f };
+
+float yaw = -90.0f;
+float pitch = 0.0f;
+float fov = 45.0f;
+
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+
 bool outOfBounds(ml::Vector<float, 3> pos)
 {
 	return pos[0] > xMax || pos[0] < -xMax
@@ -207,24 +218,29 @@ int main(int argc, char* args[])
 			bullets.push_back(generateBullet(quad.worldM, quad.modelM));
 		}
 
-		if (k == vl::Key::right) ++cam.position[0];
-		if (k == vl::Key::left) --cam.position[0];
-		if (k == vl::Key::down) --cam.position[1];
-		if (k == vl::Key::up) ++cam.position[1];
+		//if (k == vl::Key::right) ++cam.position[0];
+		//if (k == vl::Key::left) --cam.position[0];
+		//if (k == vl::Key::down) --cam.position[1];
+		//if (k == vl::Key::up) ++cam.position[1];
 
 		if (k == vl::Key::escape) instance.stop();
 
 		if (k == vl::Key::q) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, rotationSpeed }) * quad.modelM;
 		if (k == vl::Key::e) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, -rotationSpeed }) * quad.modelM;
-		if (k == vl::Key::w) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
-		if (k == vl::Key::s) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { -rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
-		if (k == vl::Key::a) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, rotationSpeed, 0.0f }) * quad.modelM;
-		if (k == vl::Key::d) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, -rotationSpeed, 0.0f }) * quad.modelM;
+		//if (k == vl::Key::w) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
+		//if (k == vl::Key::s) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { -rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
+		//if (k == vl::Key::a) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, rotationSpeed, 0.0f }) * quad.modelM;
+		//if (k == vl::Key::d) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, -rotationSpeed, 0.0f }) * quad.modelM;
+
+		if (k == vl::Key::w) position += front;
+		if (k == vl::Key::s) position -= front;
+		if (k == vl::Key::a) position -= ml::normalize(ml::cross(front, up));
+		if (k == vl::Key::d) position += ml::normalize(ml::cross(front, up));
 	});
 
 	instance.onMouseMove([&](float x, float y) {
 		float xoffset = x - lastX;
-		float yoffset = lastY - y;
+		float yoffset = y - lastY;
 		lastX = x;
 		lastY = y;
 
@@ -264,6 +280,7 @@ int main(int argc, char* args[])
 	float t = 0.0f;
 
 	return instance.run([&](vl::Renderer& r, float dt) {
+		deltaTime = dt;
 
 		auto it = bullets.begin();
 		while (it != bullets.end()) {
@@ -290,7 +307,9 @@ int main(int argc, char* args[])
 		float aspect = (float)window.width / window.height;
 		//const auto projectionM = ortho(cam, (float)window.width / window.height);
 		const auto projectionM = perspective(cam, 100.0f, 0.1f, 90.0f);
+		cam.position = position;
 		cam.target = cam.position + front;
+		cam.up = up;
 		const auto viewM = view(cam);
 		auto vp = projectionM * viewM;
 
