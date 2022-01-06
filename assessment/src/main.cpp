@@ -12,7 +12,7 @@
 #include "src/camera.hpp"
 #include "src/view.hpp"
 
-float size = 2.0f;
+float quadSize = 2.0f;
 float minSize =  1.0f;
 float maxSize = 2.0f;
 float animationSpeed = 0.00002f;
@@ -119,10 +119,10 @@ Model animate(Model m)
 	return m;
 }
 
-void drawAxis(vl::Renderer& r, ml::Matrix<float, 4, 4> vp, ml::Vector<float, 3> basis)
+void drawVector(vl::Renderer& r, ml::Matrix<float, 4, 4> vp, ml::Vector<float, 3> basis)
 {
 	const auto aTransformed = vp * ml::Vector<float, 4> {  basis[0],  basis[1],  basis[2], 1.0f };
-	const auto bTransformed = vp * ml::Vector<float, 4> { -basis[0], -basis[1], -basis[2], 1.0f };
+	const auto bTransformed = vp * ml::Vector<float, 4> { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	const auto aClipped = clip({ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] });
 	const auto bClipped = clip({ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] });
@@ -156,9 +156,8 @@ int main(int argc, char* args[])
 	vl::Instance instance { window };
 
 	Model quad;
-	quad.modelM[0][0] = size;
-	quad.modelM[1][1] = size;
-	quad.modelM[2][2] = size;
+	quad.modelM = ml::identity<float, 4, 4>(quadSize) * quad.modelM;
+
 	for (int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 3) {
 		quad.vertices.push_back({ vertices[i], vertices[i + 1], vertices[i + 2] });
 	}
@@ -174,6 +173,7 @@ int main(int argc, char* args[])
 	cam.right = 10.0f;
 	cam.top = 10.0f;
 	cam.bottom = -10.0f;
+
 	Camera<3> topCam = cam;
 	topCam.up = { 0.0f, 0.0f, 1.0f };
 	topCam.position = { 0.0f, 3.0f, 0.0f };
@@ -184,6 +184,10 @@ int main(int argc, char* args[])
 	Camera<3> freeCam = cam;
 	freeCam.position = { 3.0f, 3.0f, -3.0f };
 
+	cam.position = { 0.0f, 0.0f, 3.0f };
+
+	ml::Vector<float, 3> front { 0.0f, 0.0f, -1.0f };
+
 	float roll = 0.0f;
 	float pitch = 0.0f;
 	float yaw = 0.0f;
@@ -191,6 +195,9 @@ int main(int argc, char* args[])
 	float rotationSpeed = 2.0f;
 
 	std::vector<Model> bullets;
+
+	float lastX = window.width / 2.0f;
+	float lastY = window.height / 2.0f;
 
 	instance.onKeyDown([&](vl::Key k) {
 		if (k == vl::Key::shift) {
@@ -200,10 +207,12 @@ int main(int argc, char* args[])
 			bullets.push_back(generateBullet(quad.worldM, quad.modelM));
 		}
 
-		if (k == vl::Key::right) ++quad.modelM[3][0];
-		if (k == vl::Key::left) --quad.modelM[3][0];
-		if (k == vl::Key::down) --quad.modelM[3][2];
-		if (k == vl::Key::up) ++quad.modelM[3][2];
+		if (k == vl::Key::right) ++cam.position[0];
+		if (k == vl::Key::left) --cam.position[0];
+		if (k == vl::Key::down) --cam.position[1];
+		if (k == vl::Key::up) ++cam.position[1];
+
+		if (k == vl::Key::escape) instance.stop();
 
 		if (k == vl::Key::q) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, rotationSpeed }) * quad.modelM;
 		if (k == vl::Key::e) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, -rotationSpeed }) * quad.modelM;
@@ -211,6 +220,27 @@ int main(int argc, char* args[])
 		if (k == vl::Key::s) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { -rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
 		if (k == vl::Key::a) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, rotationSpeed, 0.0f }) * quad.modelM;
 		if (k == vl::Key::d) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, -rotationSpeed, 0.0f }) * quad.modelM;
+	});
+
+	instance.onMouseMove([&](float x, float y) {
+		float xoffset = x - lastX;
+		float yoffset = lastY - y;
+		lastX = x;
+		lastY = y;
+
+		const float sensitivity = 1.0f;
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+
+		yaw += xoffset;
+		pitch += yoffset;
+
+		if (pitch > 89.0f)
+			pitch = 89.0f;
+		if (pitch < -89.0f)
+			pitch = -89.0f;
+
+		front = ml::normalize(front);
 	});
 
 	instance.onMouseScroll([&](float x, float y) {
@@ -222,7 +252,7 @@ int main(int argc, char* args[])
 		cam.right += zoom;
 	});
 
-	float basis = 5.0f;
+	float basis = 1.0f;
 	float bulletSpeed = 0.5f;
 
 	return instance.run([&](vl::Renderer& r) {
@@ -238,94 +268,118 @@ int main(int argc, char* args[])
 			else ++it;
 		}
 
+		float aspect = (float)window.width / window.height;
 		const auto projectionM = ortho(cam, (float)window.width / window.height);
+		cam.target = cam.position + front;
+		const auto viewM = view(cam);
+		auto vp = projectionM * viewM;
 
-		topView.draw(r, [&](vl::Renderer& r) {
-			const auto viewM = view(topCam);
-			auto vp = projectionM * viewM;
-
-			r.clear(255, 255, 255);
-
-			r.color(255, 0, 0);
-			drawAxis(r, vp, { basis, 0.0f, 0.0f });
-			r.color(0, 255, 0);
-			drawAxis(r, vp, { 0.0f, basis, 0.0f });
-			r.color(0, 0, 255);
-			drawAxis(r, vp, { 0.0f, 0.0f, basis });
-
-			r.color(0, 0, 0);
-			drawModel(r, vp, quad);
-
-			for (auto& b : bullets) {
-				drawModel(r, vp, b);
-			}
-		});
-
-		sideView.draw(r, [&](vl::Renderer& r) {
-			const auto viewM = view(sideCam);
-			auto vp = projectionM * viewM;
-
-			r.clear(255, 255, 255);
-
-			r.color(255, 0, 0);
-			drawAxis(r, vp, { basis, 0.0f, 0.0f });
-			r.color(0, 255, 0);
-			drawAxis(r, vp, { 0.0f, basis, 0.0f });
-			r.color(0, 0, 255);
-			drawAxis(r, vp, { 0.0f, 0.0f, basis });
-
-			r.color(0, 0, 0);
-			drawModel(r, vp, quad);
-
-			for (auto& b : bullets) {
-				drawModel(r, vp, b);
-			}
-		});
-
-		frontView.draw(r, [&](vl::Renderer& r) {
-			const auto viewM = view(frontCam);
-			auto vp = projectionM * viewM;
-
-			r.clear(255, 255, 255);
-
-			r.color(255, 0, 0);
-			drawAxis(r, vp, { basis, 0.0f, 0.0f });
-			r.color(0, 255, 0);
-			drawAxis(r, vp, { 0.0f, basis, 0.0f });
-			r.color(0, 0, 255);
-			drawAxis(r, vp, { 0.0f, 0.0f, basis });
-
-			r.color(0, 0, 0);
-			drawModel(r, vp, quad);
-
-			for (auto& b : bullets) {
-				drawModel(r, vp, b);
-			}
-		});
-
-		freeView.draw(r, [&](vl::Renderer& r) {
-			const auto viewM = view(freeCam);
-			auto vp = projectionM * viewM;
-
-			r.clear(255, 255, 255);
-
-			r.color(255, 0, 0);
-			drawAxis(r, vp, { basis, 0.0f, 0.0f });
-			r.color(0, 255, 0);
-			drawAxis(r, vp, { 0.0f, basis, 0.0f });
-			r.color(0, 0, 255);
-			drawAxis(r, vp, { 0.0f, 0.0f, basis });
-
-			r.color(0, 0, 0);
-			drawModel(r, vp, quad);
-
-			for (auto& b : bullets) {
-				drawModel(r, vp, b);
-			}
-		});
+		r.clear(255, 255, 255);
 
 		r.color(0, 0, 0);
-		r.drawLine({ -1.0f, 0.0f, 1.0f, 0.0f });
-		r.drawLine({ 0.0f, -1.0f, 0.0f, 1.0f });
+		float steps = 1.0f;
+		for (int i = 0; i < 10; ++i) {
+			for (int j = 0; j < 10; ++j) {
+				quad.worldM[3][0] = i;
+				quad.worldM[3][2] = j;
+				drawModel(r, vp, quad);
+			}
+		}
+
+		r.color(255, 0, 0);
+		drawVector(r, vp, { aspect * basis, 0.0f, 0.0f });
+		r.color(0, 255, 0);
+		drawVector(r, vp, { 0.0f, aspect * basis, 0.0f });
+		r.color(0, 0, 255);
+		drawVector(r, vp, { 0.0f, 0.0f, aspect * basis });
+
+
+		//topView.draw(r, [&](vl::Renderer& r) {
+		//	const auto viewM = view(topCam);
+		//	auto vp = projectionM * viewM;
+
+		//	r.clear(255, 255, 255);
+
+		//	r.color(255, 0, 0);
+		//	drawVector(r, vp, { basis, 0.0f, 0.0f });
+		//	r.color(0, 255, 0);
+		//	drawVector(r, vp, { 0.0f, basis, 0.0f });
+		//	r.color(0, 0, 255);
+		//	drawVector(r, vp, { 0.0f, 0.0f, basis });
+
+		//	r.color(0, 0, 0);
+		//	drawModel(r, vp, quad);
+
+		//	for (auto& b : bullets) {
+		//		drawModel(r, vp, b);
+		//	}
+		//});
+
+		//sideView.draw(r, [&](vl::Renderer& r) {
+		//	const auto viewM = view(sideCam);
+		//	auto vp = projectionM * viewM;
+
+		//	r.clear(255, 255, 255);
+
+		//	r.color(255, 0, 0);
+		//	drawAxis(r, vp, { basis, 0.0f, 0.0f });
+		//	r.color(0, 255, 0);
+		//	drawAxis(r, vp, { 0.0f, basis, 0.0f });
+		//	r.color(0, 0, 255);
+		//	drawAxis(r, vp, { 0.0f, 0.0f, basis });
+
+		//	r.color(0, 0, 0);
+		//	drawModel(r, vp, quad);
+
+		//	for (auto& b : bullets) {
+		//		drawModel(r, vp, b);
+		//	}
+		//});
+
+		//frontView.draw(r, [&](vl::Renderer& r) {
+		//	const auto viewM = view(frontCam);
+		//	auto vp = projectionM * viewM;
+
+		//	r.clear(255, 255, 255);
+
+		//	r.color(255, 0, 0);
+		//	drawAxis(r, vp, { basis, 0.0f, 0.0f });
+		//	r.color(0, 255, 0);
+		//	drawAxis(r, vp, { 0.0f, basis, 0.0f });
+		//	r.color(0, 0, 255);
+		//	drawAxis(r, vp, { 0.0f, 0.0f, basis });
+
+		//	r.color(0, 0, 0);
+		//	drawModel(r, vp, quad);
+
+		//	for (auto& b : bullets) {
+		//		drawModel(r, vp, b);
+		//	}
+		//});
+
+		//freeView.draw(r, [&](vl::Renderer& r) {
+		//	const auto viewM = view(freeCam);
+		//	auto vp = projectionM * viewM;
+
+		//	r.clear(255, 255, 255);
+
+		//	r.color(255, 0, 0);
+		//	drawAxis(r, vp, { basis, 0.0f, 0.0f });
+		//	r.color(0, 255, 0);
+		//	drawAxis(r, vp, { 0.0f, basis, 0.0f });
+		//	r.color(0, 0, 255);
+		//	drawAxis(r, vp, { 0.0f, 0.0f, basis });
+
+		//	r.color(0, 0, 0);
+		//	drawModel(r, vp, quad);
+
+		//	for (auto& b : bullets) {
+		//		drawModel(r, vp, b);
+		//	}
+		//});
+
+		//r.color(0, 0, 0);
+		//r.drawLine({ -1.0f, 0.0f, 1.0f, 0.0f });
+		//r.drawLine({ 0.0f, -1.0f, 0.0f, 1.0f });
 	});
 }

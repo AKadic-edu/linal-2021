@@ -35,6 +35,7 @@ namespace vl {
         virtual ~Instance();
 
         int run(std::function<void(Renderer&)>);
+        void stop();
 
         void onKeyDown(KeyHandler);
         void onMouseDown(MouseHandler);

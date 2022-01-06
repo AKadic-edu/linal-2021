@@ -11,7 +11,11 @@ namespace vl {
 
 class View {
 public:
-	View(float x1, float y1, float x2, float y2);
+	View(
+		float x1 = -1.0f,
+		float y1 = -1.0f,
+		float x2 =  1.0f,
+		float y2 =  1.0f);
 
 	void draw(vl::Renderer&, std::function<void(vl::Renderer&)>) const;
 private:

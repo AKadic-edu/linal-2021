@@ -33,6 +33,11 @@ int vl::Instance::run(std::function<void(Renderer&)> cb)
 	return 0;
 }
 
+void vl::Instance::stop()
+{
+    m_running = false;
+}
+
 void vl::Instance::onKeyDown(KeyHandler h)
 {
     m_keyHandlers.push_back(h);
@@ -234,14 +239,13 @@ vl::Key vl::Instance::convertKey(SDL_Keycode key) const
     if (key == SDLK_y) return vl::Key::y;
     if (key == SDLK_z) return vl::Key::z;
 
+    if (key == SDLK_ESCAPE) return vl::Key::escape;
     if (key == SDLK_DOWN) return vl::Key::down;
     if (key == SDLK_LEFT) return vl::Key::left;
     if (key == SDLK_RIGHT) return vl::Key::right;
     if (key == SDLK_UP) return vl::Key::up;
     if (key == SDLK_LSHIFT) return vl::Key::shift;
     if (key == SDLK_SPACE) return vl::Key::spacebar;
-
-    throw std::exception { "Key not mapped"};
 }
 
 ml::Vector<int, 2> vl::Instance::viewport() const
