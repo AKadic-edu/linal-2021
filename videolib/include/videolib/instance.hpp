@@ -34,8 +34,9 @@ namespace vl {
         Instance& operator=(Instance&&) = delete;
         virtual ~Instance();
 
-        int run(std::function<void(Renderer&)>);
+        int run(std::function<void(Renderer&, float dt)>);
         void stop();
+        int time() const;
 
         void onKeyDown(KeyHandler);
         void onMouseDown(MouseHandler);

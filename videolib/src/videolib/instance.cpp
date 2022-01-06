@@ -18,13 +18,19 @@ vl::Instance::Instance(Window& window)
     , m_mouse { 0.0f, 0.0f }
 { }
 
-int vl::Instance::run(std::function<void(Renderer&)> cb)
+int vl::Instance::run(std::function<void(Renderer&, float dt)> cb)
 {
 	setup();
 
+    int prev = 0;
+
     while (m_running) {
+        int now = time();
+        int elapsed = now - prev;
+        prev = now;
+
         pollInput();
-        cb(*m_renderer);
+        cb(*m_renderer, elapsed / 1000.0f);
         render();
     }
 
@@ -36,6 +42,11 @@ int vl::Instance::run(std::function<void(Renderer&)> cb)
 void vl::Instance::stop()
 {
     m_running = false;
+}
+
+int vl::Instance::time() const
+{
+    return SDL_GetTicks();
 }
 
 void vl::Instance::onKeyDown(KeyHandler h)
@@ -79,6 +90,7 @@ void vl::Instance::setup()
         m_window.height,
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
     );
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     m_rendererHandle = SDL_CreateRenderer(m_windowHandle, -1, SDL_RENDERER_ACCELERATED);
     m_renderer = std::make_unique<Renderer>(*m_rendererHandle, m_window);
 }

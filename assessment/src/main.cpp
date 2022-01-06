@@ -12,7 +12,7 @@
 #include "src/camera.hpp"
 #include "src/view.hpp"
 
-float quadSize = 2.0f;
+float quadSize = 0.1f;
 float minSize =  1.0f;
 float maxSize = 2.0f;
 float animationSpeed = 0.00002f;
@@ -156,7 +156,7 @@ int main(int argc, char* args[])
 	vl::Instance instance { window };
 
 	Model quad;
-	quad.modelM = ml::identity<float, 4, 4>(quadSize) * quad.modelM;
+	//quad.modelM = ml::identity<float, 4, 4>(quadSize) * quad.modelM;
 
 	for (int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 3) {
 		quad.vertices.push_back({ vertices[i], vertices[i + 1], vertices[i + 2] });
@@ -228,7 +228,7 @@ int main(int argc, char* args[])
 		lastX = x;
 		lastY = y;
 
-		const float sensitivity = 1.0f;
+		const float sensitivity = 100.0f;
 		xoffset *= sensitivity;
 		yoffset *= sensitivity;
 
@@ -240,7 +240,13 @@ int main(int argc, char* args[])
 		if (pitch < -89.0f)
 			pitch = -89.0f;
 
-		front = ml::normalize(front);
+		ml::Vector<float, 3> f {
+			std::cos(ml::radians(yaw))* std::cos(ml::radians(pitch)),
+			std::sin(ml::radians(pitch)),
+			std::sin(ml::radians(yaw))* std::cos(ml::radians(pitch))
+		};
+
+		front = ml::normalize(f);
 	});
 
 	instance.onMouseScroll([&](float x, float y) {
@@ -255,7 +261,10 @@ int main(int argc, char* args[])
 	float basis = 1.0f;
 	float bulletSpeed = 0.5f;
 
-	return instance.run([&](vl::Renderer& r) {
+	float t = 0.0f;
+
+	return instance.run([&](vl::Renderer& r, float dt) {
+
 		auto it = bullets.begin();
 		while (it != bullets.end()) {
 			auto& b = (*it);
@@ -268,8 +277,19 @@ int main(int argc, char* args[])
 			else ++it;
 		}
 
+		const float radius = 10.0f;
+
+		//t += dt;
+
+		//float camX = sin(t) * radius;
+		//float camZ = cos(t) * radius;
+
+		//cam.position[0] = camX;
+		//cam.position[2] = camZ;
+
 		float aspect = (float)window.width / window.height;
-		const auto projectionM = ortho(cam, (float)window.width / window.height);
+		//const auto projectionM = ortho(cam, (float)window.width / window.height);
+		const auto projectionM = perspective(cam, 100.0f, 0.1f, 90.0f);
 		cam.target = cam.position + front;
 		const auto viewM = view(cam);
 		auto vp = projectionM * viewM;
@@ -277,14 +297,16 @@ int main(int argc, char* args[])
 		r.clear(255, 255, 255);
 
 		r.color(0, 0, 0);
-		float steps = 1.0f;
-		for (int i = 0; i < 10; ++i) {
-			for (int j = 0; j < 10; ++j) {
-				quad.worldM[3][0] = i;
-				quad.worldM[3][2] = j;
-				drawModel(r, vp, quad);
-			}
-		}
+		drawModel(r, vp, quad);
+
+		//float steps = 1.0f;
+		//for (int i = 0; i < 10; ++i) {
+		//	for (int j = 0; j < 10; ++j) {
+		//		quad.worldM[3][0] = i;
+		//		quad.worldM[3][2] = j;
+		//		drawModel(r, vp, quad);
+		//	}
+		//}
 
 		r.color(255, 0, 0);
 		drawVector(r, vp, { aspect * basis, 0.0f, 0.0f });

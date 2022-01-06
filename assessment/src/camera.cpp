@@ -23,6 +23,19 @@ ml::Matrix<float, 4, 4> ortho(const Camera<3>& c, float aspect)
 	return m;
 }
 
+ml::Matrix<float, 4, 4> perspective(const Camera<3>& c, float far, float near, float fov)
+{
+	float s = 1.0f / std::tan((fov / 2.0f) * ml::pi / 180.0f);
+	auto m = ml::identity<float, 4, 4>(s);
+
+	m[2][2] = -far / (far - near);
+	m[3][2] = -far * near / (far - near);
+	m[2][3] = -1.0f;
+	m[3][3] = 0.0f;
+
+	return m;
+}
+
 ml::Matrix<float, 3, 3> view(const Camera<2>& c)
 {
 	auto m = ml::identity<float, 3, 3>();

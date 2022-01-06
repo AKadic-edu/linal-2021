@@ -18,6 +18,7 @@ struct Camera {
 
 ml::Matrix<float, 3, 3> ortho(const Camera<2>& c, float aspect);
 ml::Matrix<float, 4, 4> ortho(const Camera<3>& c, float aspect);
+ml::Matrix<float, 4, 4> perspective(const Camera<3>& c, float far, float near, float fov);
 ml::Matrix<float, 3, 3> view(const Camera<2>& c);
 ml::Matrix<float, 4, 4> view(const Camera<3>& c);
 
