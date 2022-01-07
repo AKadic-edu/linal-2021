@@ -48,6 +48,12 @@ namespace ml {
 	}
 
 	template<typename T>
+	constexpr Matrix<T, 4, 4> rotate(Vector<T, 3> r)
+	{
+		return rotate(r[0], r[1], r[2]);
+	}
+
+	template<typename T>
 	constexpr Matrix<T, 4, 4> scale(T x, T y, T z)
 	{
 		auto m = identity<T, 4, 4>();

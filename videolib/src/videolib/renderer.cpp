@@ -11,6 +11,7 @@
 vl::Renderer::Renderer(SDL_Renderer& rendererHandle, const Window& window)
     : m_rendererHandle { rendererHandle }
     , m_window { window }
+    , m_debug { false }
 {
     viewport(-1.0f, 1.0f, 1.0f, -1.0f);
 }
@@ -29,6 +30,11 @@ void vl::Renderer::clear(int r, int g, int b, int a)
 void vl::Renderer::color(int r, int g, int b, int a)
 {
     SDL_SetRenderDrawColor(&m_rendererHandle, r, g, b, a);
+}
+
+void vl::Renderer::debug(bool d)
+{
+    m_debug = d;
 }
 
 void vl::Renderer::viewport(float x1, float y1, float x2, float y2)
@@ -91,14 +97,27 @@ void vl::Renderer::drawModel(ml::Matrix<float, 4, 4> vp, const Model& m)
 
     drawLines(lines);
 
-    //if (showAxis) {
-    //    r.color(255, 0, 0);
-    //    drawVector(r, vp * m.worldM * m.modelM, { 1.0f, 0.0f, 0.0f });
-    //    r.color(0, 255, 0);
-    //    drawVector(r, vp * m.worldM * m.modelM, { 0.0f, 1.0f, 0.0f });
-    //    r.color(0, 0, 255);
-    //    drawVector(r, vp * m.worldM * m.modelM, { 0.0f, 0.0f, 1.0f });
-    //}
+    if (m_debug) {
+        color(255, 0, 0);
+        drawVector(vp * m.worldM * m.modelM, { 1.0f, 0.0f, 0.0f });
+        color(0, 255, 0);
+        drawVector(vp * m.worldM * m.modelM, { 0.0f, 1.0f, 0.0f });
+        color(0, 0, 255);
+        drawVector(vp * m.worldM * m.modelM, { 0.0f, 0.0f, 1.0f });
+    }
+}
+
+void vl::Renderer::drawVector(ml::Matrix<float, 4, 4> vp, ml::Vector<float, 3> vector)
+{
+    const auto aTransformed = vp * ml::Vector<float, 4> {  vector[0], vector[1], vector[2], 1.0f };
+    const auto bTransformed = vp * ml::Vector<float, 4> { 0.0f, 0.0f, 0.0f, 1.0f };
+
+    if (aTransformed[3] < 0 || bTransformed[3] < 0) return;
+
+    const ml::Vector<float, 2> aClipped{ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] };
+    const ml::Vector<float, 2> bClipped{ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] };
+
+    drawLine({ aClipped[0], aClipped[1], bClipped[0], bClipped[1] });
 }
 
 ml::Vector<int, 2> vl::Renderer::convert(const ml::Vector<float, 2>& v) const

@@ -21,7 +21,7 @@ float minSize =  1.0f;
 float maxSize = 2.0f;
 float animationSpeed = 0.00002f;
 
-bool showAxis = false;
+bool debug = false;
 
 ml::Vector<float, 2> clip(const ml::Vector<float, 2>& v)
 {
@@ -86,21 +86,6 @@ bool outOfBounds(ml::Vector<float, 3> pos)
 //	return m;
 //}
 
-void drawVector(vl::Renderer& r, ml::Matrix<float, 4, 4> vp, ml::Vector<float, 3> basis)
-{
-	const auto aTransformed = vp * ml::Vector<float, 4> {  basis[0],  basis[1],  basis[2], 1.0f };
-	const auto bTransformed = vp * ml::Vector<float, 4> { 0.0f, 0.0f, 0.0f, 1.0f };
-
-	if (aTransformed[3] < 0 || bTransformed[3] < 0) return;
-
-	const ml::Vector<float, 2> aClipped{ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] };
-	const ml::Vector<float, 2> bClipped{ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] };
-
-	r.drawLine({ aClipped[0], aClipped[1], bClipped[0], bClipped[1] });
-}
-
-
-
 int main(int argc, char* args[])
 {
 	vl::Window window { "LINAL Assessment", 640, 480 };
@@ -139,7 +124,7 @@ int main(int argc, char* args[])
 		//	bullets.push_back(generateBullet(quad.worldM, quad.modelM));
 		//}
 		if (k == vl::Key::h) {
-			showAxis = !showAxis;
+			debug = !debug;
 		}
 
 		if (k == vl::Key::escape) instance.stop();
@@ -201,6 +186,7 @@ int main(int argc, char* args[])
 	float t = 0.0f;
 
 	return instance.run([&](vl::Renderer& r, float dt) {
+		r.debug(debug);
 		deltaTime = dt;
 
 		//auto it = bullets.begin();
@@ -228,13 +214,13 @@ int main(int argc, char* args[])
 
 		r.clear(255, 255, 255);
 
-		if (showAxis) {
+		if (debug) {
 			r.color(255, 0, 0);
-			drawVector(r, vp, { aspect * basis, 0.0f, 0.0f });
+			r.drawVector(vp, { aspect * basis, 0.0f, 0.0f });
 			r.color(0, 255, 0);
-			drawVector(r, vp, { 0.0f, aspect * basis, 0.0f });
+			r.drawVector(vp, { 0.0f, aspect * basis, 0.0f });
 			r.color(0, 0, 255);
-			drawVector(r, vp, { 0.0f, 0.0f, aspect * basis });
+			r.drawVector(vp, { 0.0f, 0.0f, aspect * basis });
 		}
 
 		spaceship.update(dt);
