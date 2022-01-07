@@ -2,9 +2,10 @@
 
 #include "videolib.hpp"
 
+#include "include/videolib/model.hpp"
+#include "include/videolib/window.hpp"
 #include "include/videolib/shapes/line.hpp"
 #include "include/videolib/shapes/rectangle.hpp"
-#include "include/videolib/window.hpp"
 #include "src/videolib/utils/coordinate_helper.hpp"
 
 vl::Renderer::Renderer(SDL_Renderer& rendererHandle, const Window& window)
@@ -69,6 +70,36 @@ void vl::Renderer::drawLines(const std::vector<Line>& lines)
     SDL_RenderDrawLines(&m_rendererHandle, points.data(), static_cast<int>(count));
 }
 
+void vl::Renderer::drawModel(ml::Matrix<float, 4, 4> vp, const Model& m)
+{
+    std::vector<vl::Line> lines;
+
+    for (int i = 0; i < m.vertices.size(); ++i) {
+        const auto& a = m.vertices[i];
+        const auto& b = m.vertices[(i + 1) % m.vertices.size()];
+
+        const auto aTransformed = vp * m.worldM * m.modelM * ml::Vector<float, 4> { a[0], a[1], a[2], 1.0f };
+        const auto bTransformed = vp * m.worldM * m.modelM * ml::Vector<float, 4> { b[0], b[1], b[2], 1.0f };
+
+        if (aTransformed[3] < 0 || bTransformed[3] < 0) break;
+
+        const ml::Vector<float, 2> aClipped{ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] };
+        const ml::Vector<float, 2> bClipped{ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] };
+
+        lines.push_back({ aClipped[0], aClipped[1], bClipped[0], bClipped[1] });
+    }
+
+    drawLines(lines);
+
+    //if (showAxis) {
+    //    r.color(255, 0, 0);
+    //    drawVector(r, vp * m.worldM * m.modelM, { 1.0f, 0.0f, 0.0f });
+    //    r.color(0, 255, 0);
+    //    drawVector(r, vp * m.worldM * m.modelM, { 0.0f, 1.0f, 0.0f });
+    //    r.color(0, 0, 255);
+    //    drawVector(r, vp * m.worldM * m.modelM, { 0.0f, 0.0f, 1.0f });
+    //}
+}
 
 ml::Vector<int, 2> vl::Renderer::convert(const ml::Vector<float, 2>& v) const
 {

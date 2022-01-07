@@ -12,6 +12,7 @@ struct SDL_Renderer;
 
 namespace vl {
 	struct Line;
+	struct Model;
 	struct Window;
 
 	class Renderer {
@@ -29,6 +30,7 @@ namespace vl {
 
 		void drawLine(const Line&);
 		void drawLines(const std::vector<Line>&);
+		void drawModel(ml::Matrix<float, 4, 4> vp, const Model& m);
 	private:
 		const Window& m_window;
 		SDL_Renderer& m_rendererHandle;

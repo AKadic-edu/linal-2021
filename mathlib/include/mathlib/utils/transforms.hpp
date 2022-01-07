@@ -64,6 +64,18 @@ namespace ml {
 	{
 		return scale(s, s, s);
 	}
+
+	template<typename T>
+	constexpr Matrix<T, 4, 4> translate(Vector<T, 3> t)
+	{
+		auto m = identity<T, 4, 4>();
+
+		m[3][0] = t[0];
+		m[3][1] = t[1];
+		m[3][2] = t[2];
+
+		return m;
+	}
 }
 
 #endif // !MATHLIB_TRANSFORMS_H

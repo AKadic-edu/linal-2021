@@ -3,6 +3,7 @@ set(PROJECT_TEST_NAME ${PROJECT_NAME}_tests)
 
 add_library(${PROJECT_NAME} STATIC
 	"src/videolib/instance.cpp"
+	"src/videolib/model.cpp"
 	"src/videolib/renderer.cpp"
 	"src/videolib/utils/coordinate_helper.cpp")
 
