@@ -250,6 +250,7 @@ vl::Key vl::Instance::convertKey(SDL_Keycode key) const
     if (key == SDLK_y) return vl::Key::y;
     if (key == SDLK_z) return vl::Key::z;
 
+    if (key == SDLK_LCTRL) return vl::Key::lctrl;
     if (key == SDLK_ESCAPE) return vl::Key::escape;
     if (key == SDLK_DOWN) return vl::Key::down;
     if (key == SDLK_LEFT) return vl::Key::left;

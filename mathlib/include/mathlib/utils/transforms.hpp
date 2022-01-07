@@ -24,27 +24,45 @@ namespace ml {
 	}
 
 	template<typename T>
-	constexpr Matrix<T, 4, 4> rotate(const Matrix<T, 4, 4>& m, Vector<T, 3> r)
+	constexpr Matrix<T, 4, 4> rotate(T x, T y, T z)
 	{
 		auto xM = identity<T, 4, 4>();
-		xM[1][1] = (r[0] == 90.0f || r[0] == -90.0f) ? 0.0f : (float)(std::cos(radians(r[0])));
-		xM[1][2] = (float)(std::sin(radians(r[0])));
-		xM[2][1] = -(float)(std::sin(radians(r[0])));
-		xM[2][2] = (r[0] == 90.0f || r[0] == -90.0f) ? 0.0f : (float)(std::cos(radians(r[0])));
+		xM[1][1] = (x == 90.0f || x == -90.0f) ? 0.0f : (float)(std::cos(radians(x)));
+		xM[1][2] = (float)(std::sin(radians(x)));
+		xM[2][1] = -(float)(std::sin(radians(x)));
+		xM[2][2] = (x == 90.0f || x == -90.0f) ? 0.0f : (float)(std::cos(radians(x)));
 
 		auto yM = identity<T, 4, 4>();
-		yM[0][0] = (r[1] == 90.0f || r[1] == -90.0f) ? 0.0f : (float)(std::cos(radians(r[1])));
-		yM[0][2] = -(float)(std::sin(radians(r[1])));
-		yM[2][0] = (float)(std::sin(radians(r[1])));
-		yM[2][2] = (r[1] == 90.0f || r[1] == -90.0f) ? 0.0f : (float)(std::cos(radians(r[1])));
+		yM[0][0] = (y == 90.0f || y == -90.0f) ? 0.0f : (float)(std::cos(radians(y)));
+		yM[0][2] = -(float)(std::sin(radians(y)));
+		yM[2][0] = (float)(std::sin(radians(y)));
+		yM[2][2] = (y == 90.0f || y == -90.0f) ? 0.0f : (float)(std::cos(radians(y)));
 
 		auto zM = identity<T, 4, 4>();
-		zM[0][0] = (r[2] == 90.0f || r[2] == -90.0f) ? 0.0f : (float)(std::cos(radians(r[2])));
-		zM[0][1] = (float)(std::sin(radians(r[2])));
-		zM[1][0] = -(float)(std::sin(radians(r[2])));
-		zM[1][1] = (r[2] == 90.0f || r[2] == -90.0f) ? 0.0f : (float)(std::cos(radians(r[2])));
+		zM[0][0] = (z == 90.0f || z == -90.0f) ? 0.0f : (float)(std::cos(radians(z)));
+		zM[0][1] = (float)(std::sin(radians(z)));
+		zM[1][0] = -(float)(std::sin(radians(z)));
+		zM[1][1] = (z == 90.0f || z == -90.0f) ? 0.0f : (float)(std::cos(radians(z)));
 
-		return zM * yM * xM * m;
+		return zM * yM * xM;
+	}
+
+	template<typename T>
+	constexpr Matrix<T, 4, 4> scale(T x, T y, T z)
+	{
+		auto m = identity<T, 4, 4>();
+
+		m[0][0] = x;
+		m[1][1] = y;
+		m[2][2] = z;
+
+		return m;
+	}
+
+	template<typename T>
+	constexpr Matrix<T, 4, 4> scale(T s)
+	{
+		return scale(s, s, s);
 	}
 }
 

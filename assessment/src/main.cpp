@@ -10,6 +10,7 @@
 #include <videolib/shapes/line.hpp>
 
 #include "src/camera.hpp"
+#include "src/resources.hpp"
 #include "src/view.hpp"
 
 float quadSize = 0.1f;
@@ -17,49 +18,7 @@ float minSize =  1.0f;
 float maxSize = 2.0f;
 float animationSpeed = 0.00002f;
 
-float vertices[] = {
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f
-};
+bool showAxis = false;
 
 struct Model {
 	ml::Matrix<float, 4, 4> worldM { ml::identity<float, 4, 4>() };
@@ -107,8 +66,8 @@ Model generateBullet(ml::Matrix<float, 4, 4> w, ml::Matrix<float, 4, 4> m)
 {
 	Model bullet;
 
-	for (int i = 0; i < sizeof(vertices) / sizeof(*vertices); i += 3) {
-		bullet.vertices.push_back({ vertices[i], vertices[i + 1], vertices[i + 2] });
+	for (int i = 0; i < sizeof(cubeVertices) / sizeof(*cubeVertices); i += 3) {
+		bullet.vertices.push_back({ cubeVertices[i], cubeVertices[i + 1], cubeVertices[i + 2] });
 	}
 
 	bullet.modelM = m;
@@ -161,8 +120,16 @@ void drawModel(vl::Renderer& r, ml::Matrix<float, 4, 4> vp, Model m)
 
 		lines.push_back({ aClipped[0], aClipped[1], bClipped[0], bClipped[1] });
 	}
-
 	r.drawLines(lines);
+
+	if (showAxis) {
+		r.color(255, 0, 0);
+		drawVector(r, vp * m.worldM, { 1.0f, 0.0f, 0.0f });
+		r.color(0, 255, 0);
+		drawVector(r, vp * m.worldM, { 0.0f, 1.0f, 0.0f });
+		r.color(0, 0, 255);
+		drawVector(r, vp * m.worldM, { 0.0f, 0.0f, 1.0f });
+	}
 }
 
 int main(int argc, char* args[])
@@ -171,10 +138,14 @@ int main(int argc, char* args[])
 	vl::Instance instance { window };
 
 	Model quad;
-
-	for (int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 3) {
-		quad.vertices.push_back({ vertices[i], vertices[i + 1], vertices[i + 2] });
+	for (int i = 0; i < sizeof(cubeVertices)/sizeof(*cubeVertices); i += 3) {
+		quad.vertices.push_back({ cubeVertices[i], cubeVertices[i + 1], cubeVertices[i + 2] });
 	}
+	Model spaceship;
+	for (int i = 0; i < sizeof(spaceshipVertices) / sizeof(*spaceshipVertices); i += 3) {
+		spaceship.vertices.push_back({ spaceshipVertices[i], spaceshipVertices[i + 1], spaceshipVertices[i + 2] });
+	}
+	spaceship.modelM = spaceship.modelM * ml::rotate(0.0f, 0.0f, -90.0f) * ml::scale(1.0f, 2.0f, 1.0f) * ml::scale(0.5f);
 
 	ml::Vector<float, 3> front { 0.0f, 0.0f, -1.0f };
 
@@ -190,17 +161,20 @@ int main(int argc, char* args[])
 	float lastY = window.height / 2.0f;
 
 	instance.onKeyDown([&](vl::Key k) {
-		if (k == vl::Key::shift) {
-			quad.worldM[3] = quad.worldM[3] + quad.modelM[2];
+		if (k == vl::Key::lctrl) {
+			spaceship.worldM[3] = spaceship.worldM[3] + spaceship.modelM[2];
 		}
 		if (k == vl::Key::spacebar) {
 			bullets.push_back(generateBullet(quad.worldM, quad.modelM));
 		}
+		if (k == vl::Key::h) {
+			showAxis = !showAxis;
+		}
 
 		if (k == vl::Key::escape) instance.stop();
 
-		if (k == vl::Key::q) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, rotationSpeed }) * quad.modelM;
-		if (k == vl::Key::e) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, -rotationSpeed }) * quad.modelM;
+		if (k == vl::Key::q) quad.modelM = ml::rotate(0.0f, 0.0f, rotationSpeed) * quad.modelM;
+		if (k == vl::Key::e) quad.modelM = ml::rotate(0.0f, 0.0f, -rotationSpeed) * quad.modelM;
 
 		if (k == vl::Key::w) position += front;
 		if (k == vl::Key::s) position -= front;
@@ -208,7 +182,16 @@ int main(int argc, char* args[])
 		if (k == vl::Key::d) position += ml::normalize(ml::cross(front, up));
 	});
 
+	bool firstMouse = true;
+
 	instance.onMouseMove([&](float x, float y) {
+		if (firstMouse)
+		{
+			lastX = x;
+			lastY = y;
+			firstMouse = false;
+		}
+
 		float xoffset = x - lastX;
 		float yoffset = y - lastY;
 		lastX = x;
@@ -274,22 +257,16 @@ int main(int argc, char* args[])
 
 		r.clear(255, 255, 255);
 
-		r.color(0, 0, 0);
-
-		float steps = 1.0f;
-		for (int i = 0; i < 10; ++i) {
-			for (int j = 0; j < 10; ++j) {
-				quad.worldM[3][0] = i;
-				quad.worldM[3][2] = j;
-				drawModel(r, vp, quad);
-			}
+		if (showAxis) {
+			r.color(255, 0, 0);
+			drawVector(r, vp, { aspect * basis, 0.0f, 0.0f });
+			r.color(0, 255, 0);
+			drawVector(r, vp, { 0.0f, aspect * basis, 0.0f });
+			r.color(0, 0, 255);
+			drawVector(r, vp, { 0.0f, 0.0f, aspect * basis });
 		}
 
-		r.color(255, 0, 0);
-		drawVector(r, vp, { aspect * basis, 0.0f, 0.0f });
-		r.color(0, 255, 0);
-		drawVector(r, vp, { 0.0f, aspect * basis, 0.0f });
-		r.color(0, 0, 255);
-		drawVector(r, vp, { 0.0f, 0.0f, aspect * basis });
+		r.color(0, 0, 0);
+		drawModel(r, vp, spaceship);
 	});
 }

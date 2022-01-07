@@ -38,6 +38,7 @@ namespace vl {
 		up,
 
 		escape,
+		lctrl,
 		shift,
 		spacebar
 	};
