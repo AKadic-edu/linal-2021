@@ -129,13 +129,17 @@ int main(int argc, char* args[])
 
 		if (k == vl::Key::escape) instance.stop();
 
-		//if (k == vl::Key::q) spaceship.modelM = ml::rotate(0.0f, 0.0f, rotationSpeed) * spaceship.modelM;
-		//if (k == vl::Key::e) spaceship.modelM = ml::rotate(0.0f, 0.0f, -rotationSpeed) * spaceship.modelM;
+		if (k == vl::Key::q) spaceship.steer({  rotationSpeed, 0.0f, 0.0f });
+		if (k == vl::Key::e) spaceship.steer({ -rotationSpeed, 0.0f, 0.0f });
+		if (k == vl::Key::w) spaceship.steer({ 0.0f,  rotationSpeed, 0.0f });
+		if (k == vl::Key::s) spaceship.steer({ 0.0f, -rotationSpeed, 0.0f });
+		if (k == vl::Key::a) spaceship.steer({ 0.0f, 0.0f,  rotationSpeed });
+		if (k == vl::Key::d) spaceship.steer({ 0.0f, 0.0f, -rotationSpeed });
 
-		if (k == vl::Key::w) position += front;
-		if (k == vl::Key::s) position -= front;
-		if (k == vl::Key::a) position -= ml::normalize(ml::cross(front, up));
-		if (k == vl::Key::d) position += ml::normalize(ml::cross(front, up));
+		if (k == vl::Key::up) position += front;
+		if (k == vl::Key::down) position -= front;
+		if (k == vl::Key::left) position -= ml::normalize(ml::cross(front, up));
+		if (k == vl::Key::right) position += ml::normalize(ml::cross(front, up));
 	});
 
 	bool firstMouse = true;
@@ -166,9 +170,9 @@ int main(int argc, char* args[])
 			pitch = -89.0f;
 
 		ml::Vector<float, 3> f {
-			std::cos(ml::radians(yaw))* std::cos(ml::radians(pitch)),
+			std::cos(ml::radians(yaw)) * std::cos(ml::radians(pitch)),
 			std::sin(ml::radians(pitch)),
-			std::sin(ml::radians(yaw))* std::cos(ml::radians(pitch))
+			std::sin(ml::radians(yaw)) * std::cos(ml::radians(pitch))
 		};
 
 		front = ml::normalize(f);

@@ -13,10 +13,13 @@ public:
 
 	void update(float dt);
 	void draw(vl::Renderer&, ml::Matrix<float, 4, 4> vp);
+
+	void fire();
+	void steer(ml::Vector<float, 3>);
 private:
 	const float Speed = 0.2f;
 
-	ml::Vector<float, 3> m_direction;
+	ml::Vector<float, 4> m_direction;
 	vl::Model m_model;
 };
 
