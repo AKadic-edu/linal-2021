@@ -90,7 +90,6 @@ void vl::Instance::setup()
         m_window.height,
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN
     );
-    SDL_SetRelativeMouseMode(SDL_TRUE);
     m_rendererHandle = SDL_CreateRenderer(m_windowHandle, -1, SDL_RENDERER_ACCELERATED);
     m_renderer = std::make_unique<Renderer>(*m_rendererHandle, m_window);
 }

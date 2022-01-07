@@ -91,7 +91,7 @@ ml::Vector<float, 3> up { 0.0f, 1.0f , 0.0f };
 
 float yaw = -90.0f;
 float pitch = 0.0f;
-float fov = 45.0f;
+float fov = 90.0f;
 
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
@@ -135,8 +135,10 @@ void drawVector(vl::Renderer& r, ml::Matrix<float, 4, 4> vp, ml::Vector<float, 3
 	const auto aTransformed = vp * ml::Vector<float, 4> {  basis[0],  basis[1],  basis[2], 1.0f };
 	const auto bTransformed = vp * ml::Vector<float, 4> { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	const auto aClipped = clip({ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] });
-	const auto bClipped = clip({ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] });
+	if (aTransformed[3] < 0 || bTransformed[3] < 0) return;
+
+	const ml::Vector<float, 2> aClipped{ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] };
+	const ml::Vector<float, 2> bClipped{ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] };
 
 	r.drawLine({ aClipped[0], aClipped[1], bClipped[0], bClipped[1] });
 }
@@ -152,8 +154,10 @@ void drawModel(vl::Renderer& r, ml::Matrix<float, 4, 4> vp, Model m)
 		const auto aTransformed = vp * m.worldM * m.modelM * ml::Vector<float, 4> { a[0], a[1], a[2], 1.0f };
 		const auto bTransformed = vp * m.worldM * m.modelM * ml::Vector<float, 4> { b[0], b[1], b[2], 1.0f };
 
-		const auto aClipped = clip({ aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] });
-		const auto bClipped = clip({ bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] });
+		if (aTransformed[3] < 0 || bTransformed[3] < 0) break;
+
+		const ml::Vector<float, 2> aClipped { aTransformed[0] / aTransformed[3], aTransformed[1] / aTransformed[3] };
+		const ml::Vector<float, 2> bClipped { bTransformed[0] / bTransformed[3], bTransformed[1] / bTransformed[3] };
 
 		lines.push_back({ aClipped[0], aClipped[1], bClipped[0], bClipped[1] });
 	}
@@ -167,35 +171,10 @@ int main(int argc, char* args[])
 	vl::Instance instance { window };
 
 	Model quad;
-	//quad.modelM = ml::identity<float, 4, 4>(quadSize) * quad.modelM;
 
 	for (int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 3) {
 		quad.vertices.push_back({ vertices[i], vertices[i + 1], vertices[i + 2] });
 	}
-
-	View topView { -1.0f, 1.0f, 0.0f, 0.0f };
-	View sideView { 0.0f, 1.0f, 1.0f, 0.0f };
-	View frontView { -1.0f, 0.0f, 0.0f, -1.0f };
-	View freeView { 0.0f, 0.0f, 1.0f, -1.0f };
-
-	Camera<3> cam;
-	cam.up = { 0.0f, 1.0f, 0.0f };
-	cam.left = -10.0f;
-	cam.right = 10.0f;
-	cam.top = 10.0f;
-	cam.bottom = -10.0f;
-
-	Camera<3> topCam = cam;
-	topCam.up = { 0.0f, 0.0f, 1.0f };
-	topCam.position = { 0.0f, 3.0f, 0.0f };
-	Camera<3> sideCam = cam;
-	sideCam.position = { 3.0f, 0.0f, 0.0f };
-	Camera<3> frontCam = cam;
-	frontCam.position = { 0.0f, 0.0f, -3.0f };
-	Camera<3> freeCam = cam;
-	freeCam.position = { 3.0f, 3.0f, -3.0f };
-
-	cam.position = { 0.0f, 0.0f, 3.0f };
 
 	ml::Vector<float, 3> front { 0.0f, 0.0f, -1.0f };
 
@@ -218,19 +197,10 @@ int main(int argc, char* args[])
 			bullets.push_back(generateBullet(quad.worldM, quad.modelM));
 		}
 
-		//if (k == vl::Key::right) ++cam.position[0];
-		//if (k == vl::Key::left) --cam.position[0];
-		//if (k == vl::Key::down) --cam.position[1];
-		//if (k == vl::Key::up) ++cam.position[1];
-
 		if (k == vl::Key::escape) instance.stop();
 
 		if (k == vl::Key::q) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, rotationSpeed }) * quad.modelM;
 		if (k == vl::Key::e) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, 0.0f, -rotationSpeed }) * quad.modelM;
-		//if (k == vl::Key::w) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
-		//if (k == vl::Key::s) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { -rotationSpeed, 0.0f, 0.0f }) * quad.modelM;
-		//if (k == vl::Key::a) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, rotationSpeed, 0.0f }) * quad.modelM;
-		//if (k == vl::Key::d) quad.modelM = ml::rotate(ml::identity<float, 4, 4>(), { 0.0f, -rotationSpeed, 0.0f }) * quad.modelM;
 
 		if (k == vl::Key::w) position += front;
 		if (k == vl::Key::s) position -= front;
@@ -268,10 +238,7 @@ int main(int argc, char* args[])
 	instance.onMouseScroll([&](float x, float y) {
 		int zoom = (int)std::ceil(y);
 
-		cam.bottom -= zoom;
-		cam.top += zoom;
-		cam.left -= zoom;
-		cam.right += zoom;
+		fov += zoom;
 	});
 
 	float basis = 1.0f;
@@ -296,36 +263,27 @@ int main(int argc, char* args[])
 
 		const float radius = 10.0f;
 
-		//t += dt;
-
-		//float camX = sin(t) * radius;
-		//float camZ = cos(t) * radius;
-
-		//cam.position[0] = camX;
-		//cam.position[2] = camZ;
-
 		float aspect = (float)window.width / window.height;
-		//const auto projectionM = ortho(cam, (float)window.width / window.height);
-		const auto projectionM = perspective(cam, 100.0f, 0.1f, 90.0f);
+		Camera<3> cam;
 		cam.position = position;
 		cam.target = cam.position + front;
 		cam.up = up;
+		const auto projectionM = perspective(cam, 100.0f, 0.1f, fov);
 		const auto viewM = view(cam);
 		auto vp = projectionM * viewM;
 
 		r.clear(255, 255, 255);
 
 		r.color(0, 0, 0);
-		drawModel(r, vp, quad);
 
-		//float steps = 1.0f;
-		//for (int i = 0; i < 10; ++i) {
-		//	for (int j = 0; j < 10; ++j) {
-		//		quad.worldM[3][0] = i;
-		//		quad.worldM[3][2] = j;
-		//		drawModel(r, vp, quad);
-		//	}
-		//}
+		float steps = 1.0f;
+		for (int i = 0; i < 10; ++i) {
+			for (int j = 0; j < 10; ++j) {
+				quad.worldM[3][0] = i;
+				quad.worldM[3][2] = j;
+				drawModel(r, vp, quad);
+			}
+		}
 
 		r.color(255, 0, 0);
 		drawVector(r, vp, { aspect * basis, 0.0f, 0.0f });
@@ -333,94 +291,5 @@ int main(int argc, char* args[])
 		drawVector(r, vp, { 0.0f, aspect * basis, 0.0f });
 		r.color(0, 0, 255);
 		drawVector(r, vp, { 0.0f, 0.0f, aspect * basis });
-
-
-		//topView.draw(r, [&](vl::Renderer& r) {
-		//	const auto viewM = view(topCam);
-		//	auto vp = projectionM * viewM;
-
-		//	r.clear(255, 255, 255);
-
-		//	r.color(255, 0, 0);
-		//	drawVector(r, vp, { basis, 0.0f, 0.0f });
-		//	r.color(0, 255, 0);
-		//	drawVector(r, vp, { 0.0f, basis, 0.0f });
-		//	r.color(0, 0, 255);
-		//	drawVector(r, vp, { 0.0f, 0.0f, basis });
-
-		//	r.color(0, 0, 0);
-		//	drawModel(r, vp, quad);
-
-		//	for (auto& b : bullets) {
-		//		drawModel(r, vp, b);
-		//	}
-		//});
-
-		//sideView.draw(r, [&](vl::Renderer& r) {
-		//	const auto viewM = view(sideCam);
-		//	auto vp = projectionM * viewM;
-
-		//	r.clear(255, 255, 255);
-
-		//	r.color(255, 0, 0);
-		//	drawAxis(r, vp, { basis, 0.0f, 0.0f });
-		//	r.color(0, 255, 0);
-		//	drawAxis(r, vp, { 0.0f, basis, 0.0f });
-		//	r.color(0, 0, 255);
-		//	drawAxis(r, vp, { 0.0f, 0.0f, basis });
-
-		//	r.color(0, 0, 0);
-		//	drawModel(r, vp, quad);
-
-		//	for (auto& b : bullets) {
-		//		drawModel(r, vp, b);
-		//	}
-		//});
-
-		//frontView.draw(r, [&](vl::Renderer& r) {
-		//	const auto viewM = view(frontCam);
-		//	auto vp = projectionM * viewM;
-
-		//	r.clear(255, 255, 255);
-
-		//	r.color(255, 0, 0);
-		//	drawAxis(r, vp, { basis, 0.0f, 0.0f });
-		//	r.color(0, 255, 0);
-		//	drawAxis(r, vp, { 0.0f, basis, 0.0f });
-		//	r.color(0, 0, 255);
-		//	drawAxis(r, vp, { 0.0f, 0.0f, basis });
-
-		//	r.color(0, 0, 0);
-		//	drawModel(r, vp, quad);
-
-		//	for (auto& b : bullets) {
-		//		drawModel(r, vp, b);
-		//	}
-		//});
-
-		//freeView.draw(r, [&](vl::Renderer& r) {
-		//	const auto viewM = view(freeCam);
-		//	auto vp = projectionM * viewM;
-
-		//	r.clear(255, 255, 255);
-
-		//	r.color(255, 0, 0);
-		//	drawAxis(r, vp, { basis, 0.0f, 0.0f });
-		//	r.color(0, 255, 0);
-		//	drawAxis(r, vp, { 0.0f, basis, 0.0f });
-		//	r.color(0, 0, 255);
-		//	drawAxis(r, vp, { 0.0f, 0.0f, basis });
-
-		//	r.color(0, 0, 0);
-		//	drawModel(r, vp, quad);
-
-		//	for (auto& b : bullets) {
-		//		drawModel(r, vp, b);
-		//	}
-		//});
-
-		//r.color(0, 0, 0);
-		//r.drawLine({ -1.0f, 0.0f, 1.0f, 0.0f });
-		//r.drawLine({ 0.0f, -1.0f, 0.0f, 1.0f });
 	});
 }
