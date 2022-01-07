@@ -19,6 +19,15 @@ namespace ml {
 
 		return m;
 	}
+
+	template<typename T>
+	constexpr T clamp(T a, T min, T max)
+	{
+		if (a < min) return min;
+		if (a > max) return max;
+
+		return a;
+	}
 }
 
 #endif // !MATHLIB_HELPERS_H

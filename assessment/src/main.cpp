@@ -12,11 +12,7 @@
 #include "src/camera.hpp"
 #include "src/resources.hpp"
 #include "src/spaceship.hpp"
-
-float quadSize = 0.1f;
-float minSize =  1.0f;
-float maxSize = 2.0f;
-float animationSpeed = 0.00002f;
+#include "src/target.hpp"
 
 bool debug = false;
 
@@ -47,7 +43,6 @@ float pitch = 0.0f;
 float fov = 90.0f;
 
 float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
 
 bool outOfBounds(ml::Vector<float, 3> pos)
 {
@@ -55,19 +50,6 @@ bool outOfBounds(ml::Vector<float, 3> pos)
 		|| pos[1] > yMax || pos[1] < -yMax
 		|| pos[2] > zMax || pos[2] < -zMax;
 }
-
-//Model animate(Model m)
-//{
-//	//if (m.modelM[0][0] < minSize || m.modelM[0][0] > maxSize) {
-//	//	animationSpeed = -animationSpeed;
-//	//}
-//
-//	//m.modelM[0][0] += animationSpeed;
-//	//m.modelM[1][1] += animationSpeed;
-//	//m.modelM[2][2] += animationSpeed;
-//
-//	return m;
-//}
 
 int main(int argc, char* args[])
 {
@@ -157,6 +139,16 @@ int main(int argc, char* args[])
 
 	float t = 0.0f;
 
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist6(0.0f, 10.0f);
+
+	std::vector<Target> targets(3);
+
+	for (auto& target : targets) {
+		target.position({ (float)dist6(rng) - 5.0f, (float)dist6(rng) - 5.0f, (float)dist6(rng) - 5.0f });
+	}
+
 	return instance.run([&](vl::Renderer& r, float dt) {
 		r.debug(debug);
 		deltaTime = dt;
@@ -185,5 +177,10 @@ int main(int argc, char* args[])
 
 		spaceship.update(dt);
 		spaceship.draw(r, vp);
+
+		for (auto& target : targets) {
+			target.update(dt);
+			target.draw(r, vp);
+		}
 	});
 }

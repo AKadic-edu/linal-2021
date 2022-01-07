@@ -7,6 +7,7 @@
 #include <mathlib/vector.hpp>
 
 #include <functional>
+#include <random>
 #include <utility>
 #include <vector>
 

@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
 	"src/camera.cpp"
 	"src/resources.cpp"
 	"src/spaceship.cpp"
+	"src/target.cpp"
 	"src/view.cpp")
 
 target_include_directories(${PROJECT_NAME}
