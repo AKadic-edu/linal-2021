@@ -6,15 +6,12 @@
 #include <mathlib/utils/transforms.hpp>
 #include <videolib/instance.hpp>
 #include <videolib/key.hpp>
-#include <videolib/model.hpp>
 #include <videolib/renderer.hpp>
 #include <videolib/window.hpp>
-#include <videolib/shapes/line.hpp>
 
 #include "src/camera.hpp"
 #include "src/resources.hpp"
 #include "src/spaceship.hpp"
-#include "src/view.hpp"
 
 float quadSize = 0.1f;
 float minSize =  1.0f;
@@ -59,20 +56,6 @@ bool outOfBounds(ml::Vector<float, 3> pos)
 		|| pos[2] > zMax || pos[2] < -zMax;
 }
 
-//Model generateBullet(ml::Matrix<float, 4, 4> w, ml::Matrix<float, 4, 4> m)
-//{
-//	Model bullet;
-//
-//	for (int i = 0; i < sizeof(cubeVertices) / sizeof(*cubeVertices); i += 3) {
-//		bullet.vertices.push_back({ cubeVertices[i], cubeVertices[i + 1], cubeVertices[i + 2] });
-//	}
-//
-//	bullet.modelM = m;
-//	bullet.worldM = w;
-//
-//	return bullet;
-//}
-//
 //Model animate(Model m)
 //{
 //	//if (m.modelM[0][0] < minSize || m.modelM[0][0] > maxSize) {
@@ -93,16 +76,6 @@ int main(int argc, char* args[])
 
 	Spaceship spaceship;
 
-	//Model quad;
-	//for (int i = 0; i < sizeof(cubeVertices)/sizeof(*cubeVertices); i += 3) {
-	//	quad.vertices.push_back({ cubeVertices[i], cubeVertices[i + 1], cubeVertices[i + 2] });
-	//}
-	//Model spaceship;
-	//for (int i = 0; i < sizeof(spaceshipVertices) / sizeof(*spaceshipVertices); i += 3) {
-	//	spaceship.vertices.push_back({ spaceshipVertices[i], spaceshipVertices[i + 1], spaceshipVertices[i + 2] });
-	//}
-	//spaceship.modelM = spaceship.modelM * ml::rotate(0.0f, 0.0f, -90.0f) * ml::scale(1.0f, 2.0f, 1.0f) * ml::scale(0.5f);
-
 	ml::Vector<float, 3> front { 0.0f, 0.0f, -1.0f };
 
 	float roll = 0.0f;
@@ -111,18 +84,13 @@ int main(int argc, char* args[])
 
 	float rotationSpeed = 2.0f;
 
-	//std::vector<Model> bullets;
-
 	float lastX = window.width / 2.0f;
 	float lastY = window.height / 2.0f;
 
 	instance.onKeyDown([&](vl::Key k) {
-		//if (k == vl::Key::lctrl) {
-		//	spaceship.worldM[3] = spaceship.worldM[3] + spaceship.modelM[2];
-		//}
-		//if (k == vl::Key::spacebar) {
-		//	bullets.push_back(generateBullet(quad.worldM, quad.modelM));
-		//}
+		if (k == vl::Key::spacebar) {
+			spaceship.fire();
+		}
 		if (k == vl::Key::h) {
 			debug = !debug;
 		}
@@ -192,18 +160,6 @@ int main(int argc, char* args[])
 	return instance.run([&](vl::Renderer& r, float dt) {
 		r.debug(debug);
 		deltaTime = dt;
-
-		//auto it = bullets.begin();
-		//while (it != bullets.end()) {
-		//	auto& b = (*it);
-
-		//	b.worldM[3] = b.worldM[3] + (bulletSpeed * (b.modelM[2]));
-
-		//	if (outOfBounds({ b.worldM[3][0], b.worldM[3][1], b.worldM[3][2] })) {
-		//		it = bullets.erase(it);
-		//	}
-		//	else ++it;
-		//}
 
 		const float radius = 10.0f;
 

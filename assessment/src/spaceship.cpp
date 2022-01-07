@@ -14,18 +14,28 @@ Spaceship::Spaceship()
 void Spaceship::update(float dt)
 {
 	auto translated = dt * Speed * (m_model.modelM * m_direction);
-	m_model.worldM = m_model.worldM * ml::translate(ml::Vector<float, 3> { translated[0], translated[1], translated[2] });
+	auto translationM = ml::translate(ml::Vector<float, 3> { translated[0], translated[1], translated[2] });
+
+	m_model.worldM = m_model.worldM * translationM;
+
+	for (auto& bullet : m_bullets) {
+		bullet.update(dt);
+	}
 }
 
 void Spaceship::draw(vl::Renderer& r, ml::Matrix<float, 4, 4> vp)
 {
 	r.color(0, 0, 0);
 	r.drawModel(vp, m_model);
+
+	for (auto& bullet : m_bullets) {
+		bullet.draw(r, vp);
+	}
 }
 
 void Spaceship::fire()
 {
-	//auto translated = m_model.modelM * m_direction;
+	m_bullets.push_back({ m_model.worldM * ml::translate(ml::Vector<float, 3> { m_model.modelM[1][0], m_model.modelM[1][1], m_model.modelM[1][2] }), m_model.modelM, m_direction });
 }
 
 void Spaceship::steer(ml::Vector<float, 3> v)

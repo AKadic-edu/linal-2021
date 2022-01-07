@@ -7,6 +7,8 @@
 #include <videolib/model.hpp>
 #include <videolib/renderer.hpp>
 
+#include "src/bullet.hpp"
+
 class Spaceship {
 public:
 	Spaceship();
@@ -21,6 +23,7 @@ private:
 
 	ml::Vector<float, 4> m_direction;
 	vl::Model m_model;
+	std::vector<Bullet> m_bullets;
 };
 
 #endif // !SPACESHIP_HPP
