@@ -18,9 +18,11 @@ public:
 
 	void fire();
 	void steer(ml::Vector<float, 3>);
+	void toggleGas();
 private:
 	const float Speed = 0.2f;
 
+	float m_acceleration;
 	ml::Vector<float, 4> m_direction;
 	vl::Model m_model;
 	std::vector<Bullet> m_bullets;

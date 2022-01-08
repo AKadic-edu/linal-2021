@@ -6,6 +6,7 @@
 
 Spaceship::Spaceship()
 	: m_model{ vl::Model::create(spaceshipVertices) }
+	, m_acceleration { Speed }
 	, m_direction { 0.0f, 1.0f, 0.0f, 1.0f }
 {
 	m_model.modelM = ml::rotate(0.0f, 0.0f, -90.0f) * ml::scale(1.0f, 2.0f, 1.0f) * ml::scale(0.5f) * m_model.modelM;
@@ -13,7 +14,7 @@ Spaceship::Spaceship()
 
 void Spaceship::update(float dt)
 {
-	auto translated = dt * Speed * (m_model.modelM * m_direction);
+	auto translated = dt * m_acceleration * (m_model.modelM * m_direction);
 	auto translationM = ml::translate(ml::Vector<float, 3> { translated[0], translated[1], translated[2] });
 
 	m_model.worldM = m_model.worldM * translationM;
@@ -41,4 +42,14 @@ void Spaceship::fire()
 void Spaceship::steer(ml::Vector<float, 3> v)
 {
 	m_model.modelM = ml::rotate(v) *  m_model.modelM;
+}
+
+void Spaceship::toggleGas()
+{
+	if (m_acceleration == 0) {
+		m_acceleration = Speed;
+	}
+	else if (m_acceleration == Speed) {
+		m_acceleration = 0;
+	}
 }

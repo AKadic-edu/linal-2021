@@ -42,8 +42,6 @@ float yaw = -90.0f;
 float pitch = 0.0f;
 float fov = 90.0f;
 
-float deltaTime = 0.0f;	// time between current frame and last frame
-
 bool outOfBounds(ml::Vector<float, 3> pos)
 {
 	return pos[0] > xMax || pos[0] < -xMax
@@ -70,9 +68,6 @@ int main(int argc, char* args[])
 	float lastY = window.height / 2.0f;
 
 	instance.onKeyDown([&](vl::Key k) {
-		if (k == vl::Key::spacebar) {
-			spaceship.fire();
-		}
 		if (k == vl::Key::h) {
 			debug = !debug;
 		}
@@ -85,6 +80,9 @@ int main(int argc, char* args[])
 		if (k == vl::Key::s) spaceship.steer({ 0.0f, -rotationSpeed, 0.0f });
 		if (k == vl::Key::a) spaceship.steer({ 0.0f, 0.0f,  rotationSpeed });
 		if (k == vl::Key::d) spaceship.steer({ 0.0f, 0.0f, -rotationSpeed });
+
+		if (k == vl::Key::spacebar) spaceship.fire();
+		if (k == vl::Key::lctrl) spaceship.toggleGas();
 
 		if (k == vl::Key::up) position += front;
 		if (k == vl::Key::down) position -= front;
@@ -151,7 +149,6 @@ int main(int argc, char* args[])
 
 	return instance.run([&](vl::Renderer& r, float dt) {
 		r.debug(debug);
-		deltaTime = dt;
 
 		const float radius = 10.0f;
 
