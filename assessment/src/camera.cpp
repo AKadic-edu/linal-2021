@@ -3,22 +3,22 @@
 #include <mathlib/utils/operations.hpp>
 #include <mathlib/utils/helpers.hpp>
 
-ml::Matrix<float, 3, 3> ortho(const Camera<2>& c, float aspect)
+ml::Matrix<float, 3, 3> ortho(const Camera<2>& c, float t, float b, float l, float r, float aspect)
 {
 	auto m = ml::identity<float, 3, 3>();
 
-	m[0][0] = 2 / ((c.right - c.left) * aspect);
-	m[1][1] = 2 / (c.top - c.bottom);
+	m[0][0] = 2 / ((r - l) * aspect);
+	m[1][1] = 2 / (t - b);
 
 	return m;
 }
 
-ml::Matrix<float, 4, 4> ortho(const Camera<3>& c, float aspect)
+ml::Matrix<float, 4, 4> ortho(const Camera<3>& c, float t, float b, float l, float r, float aspect)
 {
 	auto m = ml::identity<float, 4, 4>();
 
-	m[0][0] = 2 / ((c.right - c.left) * aspect);
-	m[1][1] = 2 / (c.top - c.bottom);
+	m[0][0] = 2 / ((r - l) * aspect);
+	m[1][1] = 2 / (t - b);
 
 	return m;
 }

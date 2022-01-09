@@ -97,21 +97,5 @@ TEST_CASE("Operations") {
 				REQUIRE(result == expected);
 			}
 		}
-
-		SECTION("inverse") {
-			// Arrange
-			auto expected = ml::identity<float, 3, 3>();
-			ml::Matrix<float, 3, 3> m { ml::Vector<float, 3>
-				{ 1.0f, 2.0f, 3.0f },
-				{ 4.0f, 5.0f, 6.0f },
-				{ 7.0f, 8.0f, 9.0f }
-			};
-
-			// Act
-			auto result = ml::inverse(m);
-
-			// Assert
-			REQUIRE(result == expected);
-		}
 	}
 }
